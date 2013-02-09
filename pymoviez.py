@@ -1,6 +1,8 @@
 
 # import os
 # import urllib
+import hashlib
+import sys
 import zipfile
 import os.path
 import xml.etree.ElementTree as ET
@@ -9,8 +11,13 @@ import xml.etree.ElementTree as ET
 
 def process_xml(xml_data):
     movies = []
-    # tree = ET.parse(open(file_name, "r"))
-    tree = ET.parse(xml_data)
+    
+    try:
+        tree = ET.parse(xml_data)
+    except Exception as e:
+        print "unable to load xml data"
+        return
+
     root = tree.getroot()
     count = 0
     for movie in root.iter("Movie"):
@@ -59,7 +66,6 @@ def process_xml(xml_data):
 
         if cover:
             if os.path.isfile("output/" + cover):
-                # cover = "<img src='%s' alt='%s' style='max-height: 80px; max-width: 80px'/>" % (cover, title)
                 cover = cover
 
         if len(medium_list) > 0:
@@ -83,8 +89,6 @@ def process_xml(xml_data):
             length = length + " min"
 
         if title:
-            # if url:
-                # title = "<a href='%s' target='_new'>%s</a>" % (url, title)
             movies.append({ 'Title'    : title,
                             'Cover'    : cover,
                             'Medium'   : medium,
@@ -103,13 +107,40 @@ def create_html(movies):
     html_data  = "<html><head><title>Movie List</title></head><body>\n"
     html_data += "<table>\n" #<tr><th>Title</th><th>Medium</th></tr>
     for movie in movies:
-        html_data += "<tr><td>%s</td><td><b>%s</b></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>\n" % (movie['Cover'],
-                                                                                movie['Title'].encode('ascii', 'xmlcharrefreplace'),
-                                                                                movie['Year'],
-                                                                                movie['Country'],
+        if movie['URL']:
+            title = "<a href='%s' target='_new'>%s</a>" % (movie['URL'], movie['Title'].encode('ascii', 'xmlcharrefreplace'))
+        else:
+            title = movie['Title'].encode('ascii', 'xmlcharrefreplace')
+
+        if movie['Cover']:
+            cover = "<img src='%s' alt='%s' style='max-height: 80px; max-width: 80px'/>" % (movie['Cover'], movie['Title'].encode('ascii', 'xmlcharrefreplace'))
+        else:
+            cover = ""
+
+        if movie['Year']:
+            if movie['Country']:
+                year = " (" + movie['Country'] +  ", " + str(movie['Year']) + ")"
+            else:
+                year = " (" + str(movie['Year']) + ")"
+        else:
+            year = ""
+
+        if movie['Genre']:
+            genre = " | " + movie['Genre']
+        else:
+            genre = ""
+
+        if movie['Medium']:
+            medium = " | " + movie['Medium']
+        else:
+            medium = ""
+
+        html_data += "<tr><td>%s</td><td><b>%s%s</b><br />%s%s%s</td></tr>\n" % (cover,
+                                                                                title,
+                                                                                year,
                                                                                 movie['Length'],
-                                                                                movie['Genre'],
-                                                                                movie['Medium'])
+                                                                                genre,
+                                                                                medium)
     html_data += "</table></body></html>\n"
 
     print "created html table with %s entries" % len(movies)
@@ -151,7 +182,12 @@ def show_differences(movies_a, movies_b):
 
 def read_zip(file_name):
     xml_file_name = None
-    zfobj = zipfile.ZipFile(file_name)
+    try:
+        zfobj = zipfile.ZipFile(file_name)
+    except zipfile.BadZipfile:
+        print "file is not a zip file"
+        return
+        
     cover_count = 0
 
     for name in zfobj.namelist():
@@ -170,18 +206,22 @@ def read_zip(file_name):
     print "found %s covers and xml %s" % (cover_count, xml_file_name)
     return xml_file_name
 
-xml_file_name = read_zip("movies.zip")
-movies_dict = process_xml(xml_file_name)
+if len(sys.argv) > 1:
+    xml_file_name = read_zip(sys.argv[1])
+    movies_dict = process_xml(xml_file_name)
 
-csv_data = create_csv(movies_dict)
-output = open("output/movies.csv",'wb')
-output.write(csv_data)
-output.close()
+    if movies_dict:
+        csv_data = create_csv(movies_dict)
+        output = open("output/movies.csv",'wb')
+        output.write(csv_data)
+        output.close()
 
-html_data = create_html(movies_dict)
-output = open("output/index.html",'wb')
-output.write(html_data)
-output.close()
+        html_data = create_html(movies_dict)
+        output = open("output/index.html",'wb')
+        output.write(html_data)
+        output.close()
+else:
+    print "please add a filepath/name"
 
 # print html_data
 
