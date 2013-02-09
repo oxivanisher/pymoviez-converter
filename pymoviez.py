@@ -11,13 +11,15 @@ import xml.etree.ElementTree as ET
 # http://stackoverflow.com/questions/7806563/how-to-unzip-a-zip-file-with-python-2-4
 
 def process_xml(xml_data):
+    if not xml_data:
+        return
+        
     movies = []
     
     try:
         tree = ET.parse(xml_data)
     except Exception as e:
         print "unable to load xml data"
-        return
 
     root = tree.getroot()
     count = 0
@@ -162,6 +164,29 @@ def create_csv(movies):
     print "created csv data with %s entries" % len(movies)
     return csv_data
 
+def hashfile(filepath):
+    # helper function http://stackoverflow.com/questions/1869885/calculating-sha1-of-a-file
+    sha1 = hashlib.sha1()
+    f = open(filepath, 'rb')
+    try:
+        sha1.update(f.read())
+    finally:
+        f.close()
+    return sha1.hexdigest()
+
+def get_histfile():
+    return os.path.join(os.path.expanduser("~"), ".pymoviez-converter-lasthash")
+
+def load_old_hash():
+    old_hash = None
+    try:
+        file = open(get_histfile(), 'r')
+        old_hash = file.read()
+        file.close()
+        return old_hash
+    except IOError:
+        pass
+
 def process_zip(file_name, output_dir):
     xml_file_name = "export.xml"
     xml_file_path = None
@@ -169,6 +194,10 @@ def process_zip(file_name, output_dir):
         zfobj = zipfile.ZipFile(file_name)
     except zipfile.BadZipfile:
         print "file is not a zip file"
+        return
+
+    if hashfile(file_name) == load_old_hash():
+        print "not running, same hashes that means no update"
         return
 
     if xml_file_name not in zfobj.namelist():
@@ -201,7 +230,7 @@ if len(sys.argv) > 1:
         output_dir = "output/"
         pass
 
-    # load data from zipfile$
+    # load data from zipfile
     xml_file_path = process_zip(sys.argv[1], output_dir)
     movies_dict = process_xml(xml_file_path)
 
@@ -216,5 +245,14 @@ if len(sys.argv) > 1:
         output = open("output/index.html",'wb')
         output.write(html_data)
         output.close()
+
+        # saving hash
+        try:
+            file = open(get_histfile(), 'w')
+            file.write(hashfile(sys.argv[1]))
+            file.close()
+        except IOError:
+            print("unable to save last hash to %s" % get_histfile())
+
 else:
     print "please add a filepath/name to movies.zip export file"
