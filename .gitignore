@@ -1,7 +1,7 @@
 *.swp
 nbproject/*
 *.sublime-*
-output/
+output/*
 *.zip
 
 *.py[cod]
