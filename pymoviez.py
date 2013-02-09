@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# import os
+import os
 # import urllib
 import hashlib
 import sys
@@ -103,7 +103,6 @@ def process_xml(xml_data):
     print "loaded %s sets of movie data" % (count)
     return movies
 
-# create html output
 def create_html(movies):
     html_data  = "<html><head><title>Movie List</title></head><body>\n"
     html_data += "<table>\n" #<tr><th>Title</th><th>Medium</th></tr>
@@ -163,54 +162,50 @@ def create_csv(movies):
     print "created csv data with %s entries" % len(movies)
     return csv_data
 
-def show_differences(movies_a, movies_b):
-    # show_differences(movies_a, movies_b)
-    movies_a_list = []
-    movies_b_list = []
-
-    for movie in sorted(movies_a.keys()):
-        movies_a_list.append(movie)
-
-    for movie in sorted(movies_b.keys()):
-        movies_b_list.append(movie)
-
-    for movie in movies_a_list:
-        if movie not in movies_b_list:
-            print "new movie %s" % movie
-    for movie in movies_b_list:
-        if movie not in movies_a_list:
-            print "new movie %s" % movie
-
-def read_zip(file_name):
-    xml_file_name = None
+def process_zip(file_name, output_dir):
+    xml_file_name = "export.xml"
+    xml_file_path = None
     try:
         zfobj = zipfile.ZipFile(file_name)
     except zipfile.BadZipfile:
         print "file is not a zip file"
         return
-        
-    cover_count = 0
 
-    for name in zfobj.namelist():
-        uncompressed = zfobj.read(name)
+    if xml_file_name not in zfobj.namelist():
+        print "no %s found in zipfile" % xml_file_name
+        return
+    else:
+        cover_count = 0
+        for name in zfobj.namelist():
+            uncompressed = zfobj.read(name)
 
-        # save uncompressed data to disk
-        outputFilename = "output/" + name
-        output = open(outputFilename,'wb')
-        output.write(uncompressed)
-        output.close()
-        if ".xml" not in name:
-            cover_count += 1
-        else:
-            xml_file_name = outputFilename
+            # save uncompressed data to disk
+            outputFilename = os.path.join(output_dir, name)
+            output = open(outputFilename,'wb')
+            output.write(uncompressed)
+            output.close()
 
-    print "found %s covers and xml %s" % (cover_count, xml_file_name)
-    return xml_file_name
+            if name == xml_file_name:
+                xml_file_path = outputFilename
+            else:
+                cover_count += 1
 
+        print "found %s covers and xml %s" % (cover_count, xml_file_path)
+        return xml_file_path
+
+# main
 if len(sys.argv) > 1:
-    xml_file_name = read_zip(sys.argv[1])
-    movies_dict = process_xml(xml_file_name)
+    try:
+        output_dir = sys.argv[2]
+    except IndexError:
+        output_dir = "output/"
+        pass
 
+    # load data from zipfile$
+    xml_file_path = process_zip(sys.argv[1], output_dir)
+    movies_dict = process_xml(xml_file_path)
+
+    # render outputs
     if movies_dict:
         csv_data = create_csv(movies_dict)
         output = open("output/movies.csv",'wb')
@@ -222,13 +217,4 @@ if len(sys.argv) > 1:
         output.write(html_data)
         output.close()
 else:
-    print "please add a filepath/name"
-
-# print html_data
-
-# load xml files
-# movies_a = process_xml("import/export_a.xml")
-# movies_b = process_xml("import/export_b.xml")
-
-
-# print html_data
+    print "please add a filepath/name to movies.zip export file"
