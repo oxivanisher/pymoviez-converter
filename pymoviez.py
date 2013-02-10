@@ -15,6 +15,7 @@ def process_xml(xml_data):
         return
         
     movies = []
+    movie_ids = []
     
     try:
         tree = ET.parse(xml_data)
@@ -26,6 +27,7 @@ def process_xml(xml_data):
     for movie in root.iter("Movie"):
         medium_list = []
         genere_list = []
+        movie_id = None
         loaned = ""
         loandate = ""
         country = ""
@@ -65,7 +67,9 @@ def process_xml(xml_data):
             elif attrib.tag == "URL":
                 if attrib.text:
                     url = attrib.text
-
+            elif attrib.tag == "MovieID":
+                if attrib.text:
+                    movie_id = attrib.text
 
         if cover:
             if os.path.isfile("output/" + cover):
@@ -90,6 +94,13 @@ def process_xml(xml_data):
             pass
         elif length > 0:
             length = length + " min"
+
+        if movie_id in movie_ids:
+            print "WARN: duplicated MovieID found! fix: %s" % title
+        elif not movie_id:
+            print "INFO: no MovieID found in %s" % title
+        else:
+            movie_ids.append(attrib.text)
 
         if title:
             movies.append({ 'Title'    : title,
