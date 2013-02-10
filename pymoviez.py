@@ -237,12 +237,12 @@ if len(sys.argv) > 1:
     # render outputs
     if movies_dict:
         csv_data = create_csv(movies_dict)
-        output = open(os.path.join(output_dir, "movies.csv",'wb'))
+        output = open(os.path.join(output_dir, "movies.csv"), 'wb')
         output.write(csv_data)
         output.close()
 
         html_data = create_html(movies_dict)
-        output = open(os.path.join(output_dir, "index.html",'wb'))
+        output = open(os.path.join(output_dir, "index.html"), 'wb')
         output.write(html_data)
         output.close()
 
