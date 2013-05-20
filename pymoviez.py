@@ -234,36 +234,37 @@ def process_zip(file_name, output_dir):
         return xml_file_path
 
 # main
-if len(sys.argv) > 1:
-    try:
-        output_dir = sys.argv[2]
-    except IndexError:
-        output_dir = "output/"
-        pass
-
-    # load data from zipfile
-    xml_file_path = process_zip(sys.argv[1], output_dir)
-    movies_dict = process_xml(xml_file_path)
-
-    # render outputs
-    if movies_dict:
-        csv_data = create_csv(movies_dict)
-        output = open(os.path.join(output_dir, "movies.csv"), 'wb')
-        output.write(csv_data)
-        output.close()
-
-        html_data = create_html(movies_dict)
-        output = open(os.path.join(output_dir, "index.html"), 'wb')
-        output.write(html_data)
-        output.close()
-
-        # saving hash
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
         try:
-            file = open(get_histfile(), 'w')
-            file.write(hashfile(sys.argv[1]))
-            file.close()
-        except IOError:
-            print("unable to save last hash to %s" % get_histfile())
+            output_dir = sys.argv[2]
+        except IndexError:
+            output_dir = "output/"
+            pass
 
-else:
-    print "please add a filepath/name to movies.zip export file"
+        # load data from zipfile
+        xml_file_path = process_zip(sys.argv[1], output_dir)
+        movies_dict = process_xml(xml_file_path)
+
+        # render outputs
+        if movies_dict:
+            csv_data = create_csv(movies_dict)
+            output = open(os.path.join(output_dir, "movies.csv"), 'wb')
+            output.write(csv_data)
+            output.close()
+
+            html_data = create_html(movies_dict)
+            output = open(os.path.join(output_dir, "index.html"), 'wb')
+            output.write(html_data)
+            output.close()
+
+            # saving hash
+            try:
+                file = open(get_histfile(), 'w')
+                file.write(hashfile(sys.argv[1]))
+                file.close()
+            except IOError:
+                print("unable to save last hash to %s" % get_histfile())
+
+    else:
+        print "please add a filepath/name to movies.zip export file"
