@@ -22,11 +22,11 @@ $(document).ready(function(){
 		"sPaginationType": "full_numbers",
 		"fnDrawCallback": function() {
 			$('.dataTables_paginate a').addClass('btn');
-			$('.dataTables_paginate .paginate_active').addClass('btn-success');
-			$('.dataTables_paginate .first').addClass('btn-primary');
-			$('.dataTables_paginate .last').addClass('btn-primary');
-			$('.dataTables_paginate .next').addClass('btn-primary');
-			$('.dataTables_paginate .previous').addClass('btn-primary');
+			$('.dataTables_paginate .paginate_active').addClass('btn-primary');
+			$('.dataTables_paginate .first').addClass('btn-inverse');
+			$('.dataTables_paginate .last').addClass('btn-inverse');
+			$('.dataTables_paginate .next').addClass('btn-inverse');
+			$('.dataTables_paginate .previous').addClass('btn-inverse');
 	    }
 	});
 	$("thead input").keyup( function () {

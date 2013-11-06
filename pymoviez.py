@@ -20,9 +20,14 @@ def process_xml(xml_data):
     try:
         tree = ET.parse(xml_data)
     except Exception as e:
-        print "unable to load xml data"
+        print "unable to load xml data: %s" % e
 
-    root = tree.getroot()
+    try:
+        root = tree.getroot()
+    except Exception as e:
+        print "unable to load xml data: %s" % e
+        return
+
     count = 0
     for movie in root.iter("Movie"):
         medium_list = []
