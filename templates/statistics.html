@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block content %}
+	<h3>Statistics</h3>
+	<table>
+		<tr>
+			<td>Number of Movies</td>
+			<td>{{ statsData.movieCount }}</td>
+		</tr>
+		<tr>
+			<td>Number of Media Types</td>
+			<td>{{ statsData.numMedia }}</td>
+		</tr>
+	</table>
+
+	<h3>Media types</h3>
+	<table>
+		{% for name, count in statsData.media %}
+			<tr><td>{{ name }}</td><td>{{ count }}</td></tr>
+		{% endfor %}	
+	</table>
+{% endblock %}

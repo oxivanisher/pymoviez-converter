@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block content %}
+<table class='table table-striped' id='dt_movietable'>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Movies</th>
+		</tr>
+	</thead>
+	<thead>
+		<tr>
+			<th><input style='width:100%;'/></th>
+			<th><input style='width:100%;'/></th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for name, count in data %}
+			<tr><td>{{ name }}</td><td>{{ count }}</td></tr>
+		{% endfor %}	
+	</tbody>
+</table>
+{% endblock %}
