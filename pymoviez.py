@@ -26,21 +26,30 @@ def process_xml(xml_data):
     count = 0
     for movie in root.iter("Movie"):
         medium_list = []
-        genere_list = []
+        genre_list = []
+        actors_list = []
+        director_list = []
         movie_id = None
-        loaned = ""
-        loandate = ""
-        country = ""
         cover = None
         title = None
         length = None
         url = None
-        genere = None
+        genre = None
+        personalRating = None
+        purchaseDate = None
+        seen = None
+        rating = None
+        status = None
+        mpaa = None
+        loaned = ""
+        loandate = None
+        country = None
+        plot = None
+        releaseDate = None
+        notes = None
+        position = None
 
         for attrib in movie.iter("*"):
-
-            # print attrib.tag, attrib.text
-            # Title, Cover, Medium, LoanDate
             if attrib.tag == "Title":
                 count += 1
                 title = attrib.text
@@ -51,7 +60,22 @@ def process_xml(xml_data):
                 medium_list.append(attrib.text)
             elif attrib.tag == "Genre":
                 if attrib.text:
-                    genere_list.append(attrib.text)
+                    if "&" in attrib.text:
+                        genre_list = genre_list + attrib.text.split('&')
+                    else:
+                        genre_list.append(attrib.text)
+            elif attrib.tag == "Director":
+                if attrib.text:
+                    if "," in attrib.text:
+                        director_list = director_list + attrib.text.split(',')
+                    else:
+                        director_list.append(attrib.text)
+            elif attrib.tag == "Actor":
+                if attrib.text:
+                    if attrib.text.count(',') > 1:
+                        actors_list = actors_list + attrib.text.split(',')
+                    else:
+                        actors_list.append(attrib.text)
             elif attrib.tag == "Country":
                 if attrib.text:
                     country = attrib.text
@@ -70,20 +94,40 @@ def process_xml(xml_data):
             elif attrib.tag == "MovieID":
                 if attrib.text:
                     movie_id = attrib.text
+            elif attrib.tag == "MPAA":
+                if attrib.text:
+                    mpaa = attrib.text
+            elif attrib.tag == "PersonalRating":
+                if attrib.text:
+                    personalRating = attrib.text
+            elif attrib.tag == "PurchaseDate":
+                if attrib.text:
+                    purchaseDate = attrib.text
+            elif attrib.tag == "Seen":
+                if attrib.text:
+                    seen = attrib.text
+            elif attrib.tag == "Rating":
+                if attrib.text:
+                    rating = attrib.text
+            elif attrib.tag == "Status":
+                if attrib.text:
+                    status = attrib.text
+            elif attrib.tag == "Plot":
+                if attrib.text:
+                    plot = attrib.text
+            elif attrib.tag == "ReleaseDate":
+                if attrib.text:
+                    releaseDate = attrib.text
+            elif attrib.tag == "Notes":
+                if attrib.text:
+                    notes = attrib.text
+            elif attrib.tag == "Position":
+                if attrib.text:
+                    position = attrib.text
 
         if cover:
             if os.path.isfile("output/" + cover):
                 cover = cover
-
-        if len(medium_list) > 0:
-            medium = ", ".join(medium_list)
-        else:
-            medium = ""
-
-        if len(genere_list) > 0:
-            genere = ", ".join(genere_list)
-        else:
-            genere = ""
 
         if year < 10:
             year = ""
@@ -91,9 +135,10 @@ def process_xml(xml_data):
         if not length:
             length = ""
         elif "min" in length:
+            length = length.replace('min', '').rstrip()
             pass
         elif length > 0:
-            length = length + " min"
+            length = length
 
         if movie_id in movie_ids:
             print "WARN: duplicated MovieID found! fix: %s" % title
@@ -105,14 +150,27 @@ def process_xml(xml_data):
         if title:
             movies.append({ 'Title'    : title,
                             'Cover'    : cover,
-                            'Medium'   : medium,
+                            'Media'    : medium_list,
                             'Year'     : year,
-                            'Genre'    : genere,
+                            'Genres'   : genre_list,
                             'URL'      : url,
                             'Loaned'   : loaned,
                             'Length'   : length,
                             'Country'  : country,
-                            'LoanDate' : loandate })
+                            'LoanDate' : loandate,
+                            'Directors' : director_list,
+                            'Actors'   : actors_list,
+                            'MPAA'     : mpaa,
+                            'PersonalRating' : personalRating,
+                            'PurchaseDate' : purchaseDate,
+                            'Seen'     : seen,
+                            'Rating'   : rating,
+                            'Status'   : status,
+                            'Plot'     : plot,
+                            'ReleaseDate' : releaseDate,
+                            'MovieID'  : movie_id,
+                            'Notes'    : notes,
+                            'Position' : position})
     print "loaded %s sets of movie data" % (count)
     return movies
 
@@ -217,7 +275,11 @@ def process_zip(file_name, output_dir):
     else:
         cover_count = 0
         for name in zfobj.namelist():
-            uncompressed = zfobj.read(name)
+            try:
+                uncompressed = zfobj.read(name)
+            except Exception as e:
+                print "Error opening Zip File: %s" % e
+                return
 
             # save uncompressed data to disk
             outputFilename = os.path.join(output_dir, name)
