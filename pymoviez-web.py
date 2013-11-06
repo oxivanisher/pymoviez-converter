@@ -12,6 +12,9 @@ import signal
 
 from pymoviez import *
 
+HOST='127.0.0.1'
+PORT=12000
+
 movies_dict = None
 serverApp = flask.Flask(__name__)
 serverApp.secret_key = os.urandom(24)
@@ -134,7 +137,8 @@ if __name__ == '__main__':
             # print movies_dict
 
             # go into endless loop
-            serverApp.run(host='0.0.0.0')
+            # serverApp.run(host='0.0.0.0')
+            serverApp.run(host=HOST, port=PORT)
             # process = Process(target=serverApp.run(host='0.0.0.0'))
 
         else:
