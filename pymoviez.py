@@ -156,6 +156,7 @@ def process_xml(xml_data):
             movies.append({ 'Title'    : title,
                             'Cover'    : cover,
                             'Media'    : medium_list,
+                            'MediaString': ', '.join(medium_list),
                             'Year'     : year,
                             'Genres'   : genre_list,
                             'URL'      : url,
