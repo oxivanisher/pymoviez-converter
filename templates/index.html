@@ -5,7 +5,7 @@
 	<thead>
 		<tr>
 			<th>Title</th>
-<!-- 			<th>Year</th> -->
+< 			<th>Year</th>
 			<th>Medium</th>
 			<th>Loaned to</th>
 		</tr>
@@ -13,7 +13,7 @@
 	<thead>
 		<tr>
 			<th><input style='width:100%;'/></th>
-			<!-- <th><input style='width:100%;'/></th> -->
+			<th><input style='width:100%;'/></th>
 			<th><input style='width:100%;'/></th>
 			<th><input style='width:100%;'/></th>
 		</tr>
@@ -22,7 +22,7 @@
 	{% for movie in movies %}
 		<tr>
 			<td><a href="movie/{{movie.index}}">{{movie.Title}}</a></td>
-			<!-- <td><a href="movie/{{movie.index}}">{{movie.Year}}</a></td> -->
+			<td><a href="movie/{{movie.index}}">{{movie.Year}}</a></td>
 			<td><a href="movie/{{movie.index}}">{{movie.MediaString}}</a></td>
 			<td><a href="movie/{{movie.index}}">{{movie.Loaned}}</a></td>
 		</tr>
