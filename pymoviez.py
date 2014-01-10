@@ -15,7 +15,7 @@ def get_movie_attribs(movie):
     listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
     intAttributes  = ['Year']
     movieData = {}
-    printWarning = False
+    unknownTags = []
 
     for attrib in movie.iter("*"):
         if attrib.tag in textAttributes:
@@ -58,7 +58,7 @@ def get_movie_attribs(movie):
                     else:
                         movieData[attrib.tag].append(attrib.text)
         else:
-            printWarning.append(attrib.tag)
+            unknownTags.append(attrib.tag)
 
     # special field tests:
     try:
@@ -73,8 +73,8 @@ def get_movie_attribs(movie):
         print "No Media for MovieID: %s" % movieData['MovieID']
         movieData['Title'] = "Unknown Title"
 
-    if len(printWarning) > 0:
-        print "Unknown or empty tags for movie: %s (%s)" % (movieData['Title'], ', '.join(printWarning))
+    if len(unknownTags) > 0:
+        print "Unknown or empty tags for movie: %s (%s)" % (movieData['Title'], ', '.join(unknownTags))
 
     try:
         movieData['Medium']
