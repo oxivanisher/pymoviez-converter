@@ -71,6 +71,16 @@ def get_movie_attribs(movie):
             print "Missing field: %s for %s" % (field, tmpTitle)
             movieData[field] = tmpTitle
 
+    for field in textAttributes:
+        if field not in movieData.keys():
+            movieData[field] = ""
+    for field in listAttributes:
+        if field not in movieData.keys():
+            movieData[field] = []
+    for field in intAttributes:
+        if field not in movieData.keys():
+            movieData[field] = 0
+
     if len(unknownTags) > 0:
         print "Unknown or empty tags for movie: %s (%s)" % (movieData['Title'], ', '.join(unknownTags))
 
