@@ -38,19 +38,22 @@ def get_movie_attribs(movie):
             elif attrib.tag == "Genre":
                 if attrib.text:
                     if "&" in attrib.text:
-                        movieData[attrib.tag] = movieData[attrib.tag] + attrib.text.split('&').strip()
+                        for value in attrib.text.split('&'):
+                            movieData[attrib.tag].append(value.strip())
                     else:
                         movieData[attrib.tag].append(attrib.text)
             elif attrib.tag == "Director":
                 if attrib.text:
                     if "," in attrib.text:
-                        movieData[attrib.tag] = movieData[attrib.tag] + attrib.text.split(',').strip()
+                        for value in attrib.text.split(','):
+                            movieData[attrib.tag].append(value.strip())
                     else:
                         movieData[attrib.tag].append(attrib.text)
             elif attrib.tag == "Actor":
                 if attrib.text:
                     if attrib.text.count(',') > 1:
-                        movieData[attrib.tag] = movieData[attrib.tag] + attrib.text.split(',').strip()
+                        for value in attrib.text.split(','):
+                            movieData[attrib.tag].append(value.strip())
                     else:
                         movieData[attrib.tag].append(attrib.text)
         else:
