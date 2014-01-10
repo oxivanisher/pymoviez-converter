@@ -129,7 +129,7 @@ if __name__ == '__main__':
             for movieData in movies_dict:
                 movieData['Directortring'] = ', '.join(movieData['Director'])
                 movieData['Actortring'] = ', '.join(movieData['Actor'])
-                movieData['MediaString'] = ', '.join(movieData['Media'])
+                movieData['MediaString'] = ', '.join(movieData['Medium'])
                 movieData['Genretring'] = ', '.join(movieData['Genre'])
                 movieData['index'] = movies_dict.index(movieData)
 
