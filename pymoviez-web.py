@@ -25,21 +25,21 @@ serverApp.debug = True
 def hello_world():
     return flask.render_template('index.html', movies = movies_dict)
 
-@serverApp.route('/genres')
-def show_genres():
+@serverApp.route('/genre')
+def show_genre():
     stats = {}
-    genres = []
-    allGenres = []
+    genre = []
+    allGenre = []
 
     for movie in movies_dict:
-        for genre in movie['Genres']:
-            allGenres.append(genre)
-        genres = list(set(allGenres))
+        for genre in movie['Genre']:
+            allGenre.append(genre)
+        genre = list(set(allGenre))
 
-    for i in xrange(len(genres)):
-        genres[i] = (genres[i], allGenres.count(genres[i]))
+    for i in xrange(len(genre)):
+        genre[i] = (genre[i], allGenre.count(genre[i]))
 
-    return flask.render_template('2_colum_table.html', data = genres)
+    return flask.render_template('2_colum_table.html', data = genre)
 
 @serverApp.route('/director')
 def show_director():
@@ -57,21 +57,21 @@ def show_director():
 
     return flask.render_template('2_colum_table.html', data = director)
 
-@serverApp.route('/actors')
-def show_actors():
+@serverApp.route('/actor')
+def show_actor():
     stats = {}
-    actors = []
-    allActors = []
+    actor = []
+    allActor = []
 
     for movie in movies_dict:
-        for actor in movie['Actors']:
-            allActors.append(actor)
-        actors = list(set(allActors))
+        for actor in movie['Actor']:
+            allActor.append(actor)
+        actor = list(set(allActor))
 
-    for i in xrange(len(actors)):
-        actors[i] = (actors[i], allActors.count(actors[i]))
+    for i in xrange(len(actor)):
+        actor[i] = (actor[i], allActor.count(actor[i]))
 
-    return flask.render_template('2_colum_table.html', data = actors)
+    return flask.render_template('2_colum_table.html', data = actor)
 
 @serverApp.route('/statistics')
 def show_statistics():
@@ -128,9 +128,9 @@ if __name__ == '__main__':
         if movies_dict:
             for movieData in movies_dict:
                 movieData['Directortring'] = ', '.join(movieData['Director'])
-                movieData['ActorString'] = ', '.join(movieData['Actors'])
+                movieData['Actortring'] = ', '.join(movieData['Actor'])
                 movieData['MediaString'] = ', '.join(movieData['Media'])
-                movieData['GenreString'] = ', '.join(movieData['Genres'])
+                movieData['Genretring'] = ', '.join(movieData['Genre'])
                 movieData['index'] = movies_dict.index(movieData)
 
             print "Loaded %s movies" % len(movies_dict)
