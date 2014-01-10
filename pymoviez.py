@@ -14,6 +14,7 @@ def get_movie_attribs(movie):
     textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position']
     listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
     intAttributes  = ['Year']
+    neededFields   = ['Title', 'MovieID', 'Medium']
     movieData = {}
     unknownTags = []
 
@@ -63,27 +64,16 @@ def get_movie_attribs(movie):
                     unknownTags.append(attrib.tag)
 
     # special field tests:
-    try:
-        movieData['MovieID']
-    except:
-        print "No Media for Title: %s" % movieData['Title']
-        movieData['MovieID'] = os.urandom(16).encode('hex')
 
-    try:
-        movieData['Title']
-    except:
-        print "No Media for MovieID: %s" % movieData['MovieID']
-        movieData['Title'] = "Unknown Title"
+    # needed fields:
+    for field in neededFields:
+        if field not in movieData:
+            rndKey = os.urandom(16).encode('hex')
+            print "Missing field: %s in %s" % (field, rndKey)
+            movieData[field] = rndKey
 
     if len(unknownTags) > 0:
         print "Unknown or empty tags for movie: %s (%s)" % (movieData['Title'], ', '.join(unknownTags))
-
-    try:
-        movieData['Medium']
-        movieData['MediaString'] = ', '.join(movieData['Medium'])
-    except:
-        print "No Media for Title: %s" % movieData['Title']
-        movieData['MediaString'] = []
 
     if movieData['Cover']:
         if not os.path.isfile("output/" + movieData['Cover']):
