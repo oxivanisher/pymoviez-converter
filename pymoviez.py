@@ -59,7 +59,8 @@ def get_movie_attribs(movie):
                         movieData[attrib.tag].append(attrib.text)
         else:
             if attrib.text:
-                unknownTags.append(attrib.tag)
+                if len(attrib.text.strip()) > 0:
+                    unknownTags.append(attrib.tag)
 
     # special field tests:
     try:
@@ -268,7 +269,7 @@ def process_xml(xml_data):
         #                     'Notes'    : notes,
         #                     'Position' : position})
 
-    print "loaded %s sets of movie data" % (len(movies))
+    print "Parsed %s sets of movie data" % (len(movies))
     return movies
 
 def create_html(movies):
