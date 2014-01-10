@@ -63,9 +63,6 @@ def get_movie_attribs(movie):
                 if len(attrib.text.strip()) > 0:
                     unknownTags.append(attrib.tag)
 
-    # special field tests:
-
-    # needed fields:
     for field in neededFields:
         if field not in movieData:
             tmpTitle = os.urandom(16).encode('hex')
@@ -81,11 +78,11 @@ def get_movie_attribs(movie):
         if not os.path.isfile("output/" + movieData['Cover']):
             print "Missing Cover for movie: %s" % movieData['Title']
 
-    if movieData['Year'] < 10:
+    if 'Year' in movieData.keys() < 10:
         movieData['Year'] = 0
         print "Missing movie Year for: %s" % movieData['Title']
 
-    if not movieData['Length']:
+    if 'Length' not in movieData.keys():
         movieData['Length'] = 0
     elif "min" in movieData['Length']:
         movieData['Length'] = movieData['Length'].replace('min', '').strip()

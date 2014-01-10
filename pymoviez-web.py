@@ -98,10 +98,6 @@ def show_statistics():
 @serverApp.route('/movie/<int:movieId>', methods = ['GET'])
 def movie_detail(movieId):
     movieData = movies_dict[movieId]
-    movieData['DirectorString'] = ', '.join(movieData['Directors'])
-    movieData['ActorString'] = ', '.join(movieData['Actors'])
-    movieData['MediaString'] = ', '.join(movieData['Media'])
-    movieData['GenreString'] = ', '.join(movieData['Genres'])
     # try:
     return flask.render_template('movie_details.html', movie = movieData)
     # except 
@@ -130,10 +126,14 @@ if __name__ == '__main__':
         movies_dict = process_xml('output/export.xml')
 
         if movies_dict:
-            for movie in movies_dict:
-                movie['index'] = movies_dict.index(movie)
+            for movieData in movies_dict:
+                movieData['DirectorString'] = ', '.join(movieData['Directors'])
+                movieData['ActorString'] = ', '.join(movieData['Actors'])
+                movieData['MediaString'] = ', '.join(movieData['Media'])
+                movieData['GenreString'] = ', '.join(movieData['Genres'])
+                movieData['index'] = movies_dict.index(movieData)
 
-            print "loaded %s movies" % len(movies_dict)
+            print "Loaded %s movies" % len(movies_dict)
             # print movies_dict
 
             # go into endless loop
