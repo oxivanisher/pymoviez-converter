@@ -58,7 +58,8 @@ def get_movie_attribs(movie):
                     else:
                         movieData[attrib.tag].append(attrib.text)
         else:
-            unknownTags.append(attrib.tag)
+            if len(attrib.text.strip()) > 0:
+                unknownTags.append(attrib.tag)
 
     # special field tests:
     try:
