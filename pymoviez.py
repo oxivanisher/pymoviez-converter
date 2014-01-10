@@ -86,7 +86,7 @@ def get_movie_attribs(movie):
 
     if not movieData['Length']:
         movieData['Length'] = 0
-    elif "min" in length:
+    elif "min" in movieData['Length']:
         movieData['Length'] = movieData['Length'].replace('min', '').strip()
 
     return movieData
