@@ -68,13 +68,11 @@ def get_movie_attribs(movie):
     # needed fields:
     for field in neededFields:
         if field not in movieData:
-            rndKey = os.urandom(16).encode('hex')
+            tmpTitle = os.urandom(16).encode('hex')
             if 'Title' in movieData:
                 tmpTitle = movieData['Title']
-            else:
-                tmpTitle = rndKey
-            print "Missing field: %s for %s" % (field, rndKey)
-            movieData[field] = rndKey
+            print "Missing field: %s for %s" % (field, tmpTitle)
+            movieData[field] = tmpTitle
 
     if len(unknownTags) > 0:
         print "Unknown or empty tags for movie: %s (%s)" % (movieData['Title'], ', '.join(unknownTags))
