@@ -41,21 +41,21 @@ def show_genres():
 
     return flask.render_template('2_colum_table.html', data = genres)
 
-@serverApp.route('/directors')
-def show_directors():
+@serverApp.route('/director')
+def show_director():
     stats = {}
-    directors = []
-    allDirectors = []
+    director = []
+    allDirector = []
 
     for movie in movies_dict:
-        for director in movie['Directors']:
-            allDirectors.append(director)
-        directors = list(set(allDirectors))
+        for director in movie['Director']:
+            allDirector.append(director)
+        director = list(set(allDirector))
 
-    for i in xrange(len(directors)):
-        directors[i] = (directors[i], allDirectors.count(directors[i]))
+    for i in xrange(len(director)):
+        director[i] = (director[i], allDirector.count(director[i]))
 
-    return flask.render_template('2_colum_table.html', data = directors)
+    return flask.render_template('2_colum_table.html', data = director)
 
 @serverApp.route('/actors')
 def show_actors():
@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
         if movies_dict:
             for movieData in movies_dict:
-                movieData['DirectorString'] = ', '.join(movieData['Directors'])
+                movieData['Directortring'] = ', '.join(movieData['Director'])
                 movieData['ActorString'] = ', '.join(movieData['Actors'])
                 movieData['MediaString'] = ', '.join(movieData['Media'])
                 movieData['GenreString'] = ', '.join(movieData['Genres'])
