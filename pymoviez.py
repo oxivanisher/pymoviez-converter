@@ -10,6 +10,87 @@ import xml.etree.ElementTree as ET
 
 # http://stackoverflow.com/questions/7806563/how-to-unzip-a-zip-file-with-python-2-4
 
+def get_movie_attribs(movie):
+    textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position']
+    listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
+    intAttributes  = ['Year']
+    movieData = {}
+
+    for attrib in movie.iter("*"):
+        if attrib.tag in textAttributes:
+            if attrib.text:
+                movieData[attrib.tag] = attrib.text
+            else:
+                movieData[attrib.tag] = ""
+        elif attrib.tag in intAttributes:
+            if attrib.text:
+                movieData[attrib.tag] = int(attrib.text)
+            else:
+                movieData[attrib.tag] = 0
+        elif attrib.tag in listAttributes:
+            try:
+                movieData[attrib.tag]
+            except:
+                movieData[attrib.tag] = []
+
+            if attrib.tag == "Medium":
+                movieData[attrib.tag].append(attrib.text)
+            elif attrib.tag == "Genre":
+                if attrib.text:
+                    if "&" in attrib.text:
+                        movieData[attrib.tag] = movieData[attrib.tag] + attrib.text.split('&').strip()
+                    else:
+                        movieData[attrib.tag].append(attrib.text)
+            elif attrib.tag == "Director":
+                if attrib.text:
+                    if "," in attrib.text:
+                        movieData[attrib.tag] = movieData[attrib.tag] + attrib.text.split(',').strip()
+                    else:
+                        movieData[attrib.tag].append(attrib.text)
+            elif attrib.tag == "Actor":
+                if attrib.text:
+                    if attrib.text.count(',') > 1:
+                        movieData[attrib.tag] = movieData[attrib.tag] + attrib.text.split(',').strip()
+                    else:
+                        movieData[attrib.tag].append(attrib.text)
+        else:
+            print "Unknown movie attribute: <%s> with value <%s>" % (attrib.tag, attrib.text)
+
+    # special field tests:
+    try:
+        movieData['MovieID']
+    except:
+        print "No Media for Title: %s" % movieData['Title']
+        movieData['MovieID'] = os.urandom(16).encode('hex')
+
+    try:
+        movieData['Title']
+    except:
+        print "No Media for MovieID: %s" % movieData['MovieID']
+        movieData['Title'] = "Unknown Title"
+
+    try:
+        movieData['Medium']
+        movieData['MediaString'] = ', '.join(movieData['Medium'])
+    except:
+        print "No Media for Title: %s" % movieData['Title']
+        movieData['MediaString'] = []
+
+    if movieData['Cover']:
+        if not os.path.isfile("output/" + movieData['Cover']):
+            print "Missing Cover for movie: %s" % movieData['Title']
+
+    if movieData['Year'] < 10:
+        movieData['Year'] = 0
+        print "Missing movie Year for: %s" % movieData['Title']
+
+    if not movieData['Length']:
+        movieData['Length'] = 0
+    elif "min" in length:
+        movieData['Length'] = movieData['Length'].replace('min', '').strip()
+
+    return movieData
+
 def process_xml(xml_data):
     if not xml_data:
         return
@@ -28,156 +109,158 @@ def process_xml(xml_data):
         print "unable to load xml data: %s" % e
         return
 
-    count = 0
+    # count = 0
     for movie in root.iter("Movie"):
-        medium_list = []
-        genre_list = []
-        actors_list = []
-        director_list = []
-        movie_id = None
-        cover = None
-        title = None
-        length = None
-        url = None
-        genre = None
-        personalRating = None
-        purchaseDate = None
-        seen = None
-        rating = None
-        status = None
-        mpaa = None
-        loaned = ""
-        loandate = None
-        country = None
-        plot = None
-        releaseDate = None
-        notes = None
-        position = None
+        movieData = get_movie_attribs(movie)
+        movies.append(movieData)
 
-        for attrib in movie.iter("*"):
-            if attrib.tag == "Title":
-                count += 1
-                title = attrib.text
-            elif attrib.tag == "Cover":
-                if attrib.text:
-                    cover = attrib.text
-            elif attrib.tag == "Medium":
-                medium_list.append(attrib.text)
-            elif attrib.tag == "Genre":
-                if attrib.text:
-                    if "&" in attrib.text:
-                        genre_list = genre_list + attrib.text.split('&')
-                    else:
-                        genre_list.append(attrib.text)
-            elif attrib.tag == "Director":
-                if attrib.text:
-                    if "," in attrib.text:
-                        director_list = director_list + attrib.text.split(',')
-                    else:
-                        director_list.append(attrib.text)
-            elif attrib.tag == "Actor":
-                if attrib.text:
-                    if attrib.text.count(',') > 1:
-                        actors_list = actors_list + attrib.text.split(',')
-                    else:
-                        actors_list.append(attrib.text)
-            elif attrib.tag == "Country":
-                if attrib.text:
-                    country = attrib.text
-            elif attrib.tag == "Year":
-                year = int(attrib.text)
-            elif attrib.tag == "Loaned":
-                if attrib.text:
-                    loaned = attrib.text
-            elif attrib.tag == "LoanDate":
-                loandate = attrib.text
-            elif attrib.tag == "Length":
-                length = attrib.text
-            elif attrib.tag == "URL":
-                if attrib.text:
-                    url = attrib.text
-            elif attrib.tag == "MovieID":
-                if attrib.text:
-                    movie_id = attrib.text
-            elif attrib.tag == "MPAA":
-                if attrib.text:
-                    mpaa = attrib.text
-            elif attrib.tag == "PersonalRating":
-                if attrib.text:
-                    personalRating = attrib.text
-            elif attrib.tag == "PurchaseDate":
-                if attrib.text:
-                    purchaseDate = attrib.text
-            elif attrib.tag == "Seen":
-                if attrib.text:
-                    seen = attrib.text
-            elif attrib.tag == "Rating":
-                if attrib.text:
-                    rating = attrib.text
-            elif attrib.tag == "Status":
-                if attrib.text:
-                    status = attrib.text
-            elif attrib.tag == "Plot":
-                if attrib.text:
-                    plot = attrib.text
-            elif attrib.tag == "ReleaseDate":
-                if attrib.text:
-                    releaseDate = attrib.text
-            elif attrib.tag == "Notes":
-                if attrib.text:
-                    notes = attrib.text
-            elif attrib.tag == "Position":
-                if attrib.text:
-                    position = attrib.text
+        # medium_list = []
+        # genre_list = []
+        # actors_list = []
+        # director_list = []
+        # movie_id = None
+        # cover = None
+        # title = None
+        # length = None
+        # url = None
+        # genre = None
+        # personalRating = None
+        # purchaseDate = None
+        # seen = None
+        # rating = None
+        # status = None
+        # mpaa = None
+        # loaned = ""
+        # loandate = None
+        # country = None
+        # plot = None
+        # releaseDate = None
+        # notes = None
+        # position = None
 
-        if cover:
-            if os.path.isfile("output/" + cover):
-                cover = cover
+        # for attrib in movie.iter("*"):
+        #     if attrib.tag == "Title":
+        #         count += 1
+        #         title = attrib.text
+        #     elif attrib.tag == "Cover":
+        #         if attrib.text:
+        #             cover = attrib.text
+        #     elif attrib.tag == "Medium":
+        #         medium_list.append(attrib.text)
+        #     elif attrib.tag == "Genre":
+        #         if attrib.text:
+        #             if "&" in attrib.text:
+        #                 genre_list = genre_list + attrib.text.split('&')
+        #             else:
+        #                 genre_list.append(attrib.text)
+        #     elif attrib.tag == "Director":
+        #         if attrib.text:
+        #             if "," in attrib.text:
+        #                 director_list = director_list + attrib.text.split(',')
+        #             else:
+        #                 director_list.append(attrib.text)
+        #     elif attrib.tag == "Actor":
+        #         if attrib.text:
+        #             if attrib.text.count(',') > 1:
+        #                 actors_list = actors_list + attrib.text.split(',')
+        #             else:
+        #                 actors_list.append(attrib.text)
+        #     elif attrib.tag == "Country":
+        #         if attrib.text:
+        #             country = attrib.text
+        #     elif attrib.tag == "Year":
+        #         year = int(attrib.text)
+        #     elif attrib.tag == "Loaned":
+        #         if attrib.text:
+        #             loaned = attrib.text
+        #     elif attrib.tag == "LoanDate":
+        #         loandate = attrib.text
+        #     elif attrib.tag == "Length":
+        #         length = attrib.text
+        #     elif attrib.tag == "URL":
+        #         if attrib.text:
+        #             url = attrib.text
+        #     elif attrib.tag == "MovieID":
+        #         if attrib.text:
+        #             movie_id = attrib.text
+        #     elif attrib.tag == "MPAA":
+        #         if attrib.text:
+        #             mpaa = attrib.text
+        #     elif attrib.tag == "PersonalRating":
+        #         if attrib.text:
+        #             personalRating = attrib.text
+        #     elif attrib.tag == "PurchaseDate":
+        #         if attrib.text:
+        #             purchaseDate = attrib.text
+        #     elif attrib.tag == "Seen":
+        #         if attrib.text:
+        #             seen = attrib.text
+        #     elif attrib.tag == "Rating":
+        #         if attrib.text:
+        #             rating = attrib.text
+        #     elif attrib.tag == "Status":
+        #         if attrib.text:
+        #             status = attrib.text
+        #     elif attrib.tag == "Plot":
+        #         if attrib.text:
+        #             plot = attrib.text
+        #     elif attrib.tag == "ReleaseDate":
+        #         if attrib.text:
+        #             releaseDate = attrib.text
+        #     elif attrib.tag == "Notes":
+        #         if attrib.text:
+        #             notes = attrib.text
+        #     elif attrib.tag == "Position":
+        #         if attrib.text:
+        #             position = attrib.text
 
-        if year < 10:
-            year = ""
+        # if cover:
+        #     if os.path.isfile("output/" + cover):
+        #         cover = cover
 
-        if not length:
-            length = ""
-        elif "min" in length:
-            length = length.replace('min', '').rstrip()
-            pass
-        elif length > 0:
-            length = length
+        # if year < 10:
+        #     year = ""
 
-        if movie_id in movie_ids:
-            print "WARN: duplicated MovieID found! fix: %s" % title
-        elif not movie_id:
-            print "INFO: no MovieID found in %s" % title
+        # if not length:
+        #     length = ""
+        # elif "min" in length:
+        #     length = length.replace('min', '').rstrip()
+        #     pass
+        # elif length > 0:
+        #     length = length
+
+        if movieData['MovieID'] in movie_ids:
+            print "WARNING: duplicated MovieID found! Please fix: %s" % movieData['Title']
         else:
-            movie_ids.append(attrib.text)
+            movie_ids.append(movieData['MovieID'])
 
-        if title:
-            movies.append({ 'Title'    : title,
-                            'Cover'    : cover,
-                            'Media'    : medium_list,
-                            'MediaString': ', '.join(medium_list),
-                            'Year'     : year,
-                            'Genres'   : genre_list,
-                            'URL'      : url,
-                            'Loaned'   : loaned,
-                            'Length'   : length,
-                            'Country'  : country,
-                            'LoanDate' : loandate,
-                            'Directors' : director_list,
-                            'Actors'   : actors_list,
-                            'MPAA'     : mpaa,
-                            'PersonalRating' : personalRating,
-                            'PurchaseDate' : purchaseDate,
-                            'Seen'     : seen,
-                            'Rating'   : rating,
-                            'Status'   : status,
-                            'Plot'     : plot,
-                            'ReleaseDate' : releaseDate,
-                            'MovieID'  : movie_id,
-                            'Notes'    : notes,
-                            'Position' : position})
-    print "loaded %s sets of movie data" % (count)
+        # if title:
+        #     movies.append({ 'Title'    : title,
+        #                     'Cover'    : cover,
+        #                     'Media'    : medium_list,
+        #                     'MediaString': ', '.join(medium_list),
+        #                     'Year'     : year,
+        #                     'Genres'   : genre_list,
+        #                     'URL'      : url,
+        #                     'Loaned'   : loaned,
+        #                     'Length'   : length,
+        #                     'Country'  : country,
+        #                     'LoanDate' : loandate,
+        #                     'Directors' : director_list,
+        #                     'Actors'   : actors_list,
+        #                     'MPAA'     : mpaa,
+        #                     'PersonalRating' : personalRating,
+        #                     'PurchaseDate' : purchaseDate,
+        #                     'Seen'     : seen,
+        #                     'Rating'   : rating,
+        #                     'Status'   : status,
+        #                     'Plot'     : plot,
+        #                     'ReleaseDate' : releaseDate,
+        #                     'MovieID'  : movie_id,
+        #                     'Notes'    : notes,
+        #                     'Position' : position})
+
+    print "loaded %s sets of movie data" % (len(movies))
     return movies
 
 def create_html(movies):
