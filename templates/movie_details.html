@@ -47,14 +47,14 @@
 			</tr>
 			{% endif %}
 
-			{% if movie.Director.length == 0 %}
+			{% if movie.Director.length != 0 %}
 			<tr>
 				<td>Directors</td>
 				<td>{% for name in movie.Director %}{% if not loop.first %}, {% endif %}<a href="../search/Director/{{ name }}">{{ name }}</a>{% endfor %}</td>
 			</tr>
 			{% endif %}
 
-			{% if movie.Actor.length == 0 %}
+			{% if movie.Actor.length != 0 %}
 			<tr>
 				<td>Actors</td>
 				<td>{% for name in movie.Actor %}{% if not loop.first %}, {% endif %}<a href="../search/Actor/{{ name }}">{{ name }}</a>{% endfor %}</td>
@@ -125,12 +125,14 @@
 			</tr>
 			{% endif %}
 
+<!--
 			{% if movie.Position != "" %}
 			<tr>
 				<td>Position</td>
 				<td>{{ movie.Position }}</td>
 			</tr>
 			{% endif %}
+-->
 		</tbody>
 	</table>
 	<br />
