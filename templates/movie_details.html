@@ -9,7 +9,7 @@
 		</tr>
 		<tr>
 			<td>Media</td>
-			<td>{{ movie.MediaString }}</td>
+			<td>{% for name in movie.Medium %}{% if not loop.first %}, {% endif %}<a href="../search/Medium/{{ name }}">{{ name }}</a>{% endfor %}</td>
 		</tr>
 		<tr>
 			<td>Year</td>
@@ -17,7 +17,7 @@
 		</tr>
 		<tr>
 			<td>Genre</td>
-			<td>{{ movie.GenreString }}</td>
+			<td>{% for name in movie.Genre %}{% if not loop.first %}, {% endif %}<a href="../search/Genre/{{ name }}">{{ name }}</a>{% endfor %}</td>
 		</tr>
 		<tr>
 			<td>URL</td>
@@ -37,7 +37,7 @@
 		</tr>
 		<tr>
 			<td>Directors</td>
-			<td>{{ movie.DirectorString }}</td>
+			<td>{% for name in movie.Director %}{% if not loop.first %}, {% endif %}<a href="../search/Director/{{ name }}">{{ name }}</a>{% endfor %}</td>
 		</tr>
 		<tr>
 			<td>MPAA</td>
