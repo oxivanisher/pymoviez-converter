@@ -23,10 +23,12 @@
 			<td>URL</td>
 			<td><a href="{{ movie.URL }}" target="_blank">{{ movie.URL }}</a></td>
 		</tr>
+		{% if movie.Loaned != "" %}
 		<tr>
 			<td>Loaned to</td>
 			<td>{{ movie.Loaned }} since {{ movie.LoanDate }}</td>
 		</tr>
+		{% endif %}
 		<tr>
 			<td>Length</td>
 			<td>{{ movie.Length }} min</td>
