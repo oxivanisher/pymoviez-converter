@@ -2,7 +2,7 @@
 {% block title %}Index{% endblock %}
 {% block content %}
 	<h3>Statistics</h3>
-	<table style="width: 50%;">
+	<table style="width: 30%;">
 		<tr>
 			<td><a href="../">Movies</a></td>
 			<td>{{ statsData.movieCount }}</td>
@@ -26,7 +26,7 @@
 	</table>
 
 	<h3>Media types</h3>
-	<table>
+	<table style="width: 30%;">
 		{% for name, count in statsData.media %}
 			<tr><td><a href="search/Medium/{{ name }}">{{ name }}</a></td><td>{{ count }}</td></tr>
 		{% endfor %}	
