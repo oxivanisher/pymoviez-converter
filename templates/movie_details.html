@@ -2,108 +2,121 @@
 {% block title %}Index{% endblock %}
 {% block content %}
 	<table>
-		<tr>
-			<td rowspan="21" width="400" valign="top"><img src="../images/{{ movie.index }}"></td>
-			<td>Title</td>
-			<td><b>{{ movie.Title }}</b></td>
-		</tr>
-		<tr>
-			<td>Media</td>
-			<td>{% for name in movie.Medium %}{% if not loop.first %}, {% endif %}<a href="../search/Medium/{{ name }}">{{ name }}</a>{% endfor %}</td>
-		</tr>
-		<tr>
-			<td>Year</td>
-			<td><a href="../search/Year/{{ movie.Year }}">{{ movie.Year }}</a></td>
-		</tr>
-		<tr>
-			<td>Genre</td>
-			<td>{% for name in movie.Genre %}{% if not loop.first %}, {% endif %}<a href="../search/Genre/{{ name }}">{{ name }}</a>{% endfor %}</td>
-		</tr>
+		<tbody valign="top">
+			<tr>
+				<td rowspan="21" width="400"><img src="../images/{{ movie.index }}"></td>
+				<td>Title</td>
+				<td><b>{{ movie.Title }}</b></td>
+			</tr>
+			<tr>
+				<td>Media</td>
+				<td>{% for name in movie.Medium %}{% if not loop.first %}, {% endif %}<a href="../search/Medium/{{ name }}">{{ name }}</a>{% endfor %}</td>
+			</tr>
+			<tr>
+				<td>Year</td>
+				<td><a href="../search/Year/{{ movie.Year }}">{{ movie.Year }}</a></td>
+			</tr>
+			<tr>
+				<td>Genre</td>
+				<td>{% for name in movie.Genre %}{% if not loop.first %}, {% endif %}<a href="../search/Genre/{{ name }}">{{ name }}</a>{% endfor %}</td>
+			</tr>
 
-		{% if movie.URL != "" %}
-		<tr>
-			<td>URL</td>
-			<td><a href="{{ movie.URL }}" target="_blank">{{ movie.URL }}</a></td>
-		</tr>
-		{% endif %}
+			{% if movie.URL != "" %}
+			<tr>
+				<td>URL</td>
+				<td><a href="{{ movie.URL }}" target="_blank">{{ movie.URL }}</a></td>
+			</tr>
+			{% endif %}
 
-		{% if movie.Loaned != "" %}
-		<tr>
-			<td>Loaned to</td>
-			<td>{{ movie.Loaned }} since {{ movie.LoanDate }}</td>
-		</tr>
-		{% endif %}
+			{% if movie.Loaned != "" %}
+			<tr>
+				<td>Loaned to</td>
+				<td>{{ movie.Loaned }} since {{ movie.LoanDate }}</td>
+			</tr>
+			{% endif %}
 
-		<tr>
-			<td>Length</td>
-			<td>{{ movie.Length }} min</td>
-		</tr>
-		<tr>
-			<td>Country</td>
-			<td><a href="../search/Country/{{ movie.Country }}">{{ movie.Country }}</a></td>
-		</tr>
-		<tr>
-			<td>Directors</td>
-			<td>{% for name in movie.Director %}{% if not loop.first %}, {% endif %}<a href="../search/Director/{{ name }}">{{ name }}</a>{% endfor %}</td>
-		</tr>
-		<tr>
-			<td>MPAA</td>
-			<td><a href="../search/MPAA/{{ movie.MPAA }}">{{ movie.MPAA }}</a></td>
-		</tr>
+			<tr>
+				<td>Length</td>
+				<td>{{ movie.Length }} min</td>
+			</tr>
+			<tr>
+				<td>Country</td>
+				<td><a href="../search/Country/{{ movie.Country }}">{{ movie.Country }}</a></td>
+			</tr>
+			<tr>
+				<td>Directors</td>
+				<td>{% for name in movie.Director %}{% if not loop.first %}, {% endif %}<a href="../search/Director/{{ name }}">{{ name }}</a>{% endfor %}</td>
+			</tr>
+			<tr>
+				<td>Actors</td>
+				<td>{% for name in movie.Actor %}{% if not loop.first %}, {% endif %}<a href="../search/Actor/{{ name }}">{{ name }}</a>{% endfor %}</td>
+			</tr>
+			<tr>
+				<td>MPAA</td>
+				<td><a href="../search/MPAA/{{ movie.MPAA }}">{{ movie.MPAA }}</a></td>
+			</tr>
 
-		{% if movie.PersonalRating != "0" %}
-		<tr>
-			<td>PersonalRating</td>
-			<td>{{ movie.PersonalRating }}</td>
-		</tr>
-		{% endif %}
+			{% if movie.PersonalRating != "0" %}
+			<tr>
+				<td>PersonalRating</td>
+				<td>{{ movie.PersonalRating }}</td>
+			</tr>
+			{% endif %}
 
-		<tr>
-			<td>PurchaseDate</td>
-			<td>{{ movie.PurchaseDate }}</td>
-		</tr>
-		<tr>
-			<td>Seen</td>
-			<td>{{ movie.Seen }}</td>
-		</tr>
-		<tr>
-			<td>Rating</td>
-			<td>{{ movie.Rating }}</td>
-		</tr>
-		<tr>
-			<td>Status</td>
-			<td>{{ movie.Status }}</td>
-		</tr>
-		<tr>
-			<td>Actors</td>
-			<td>{% for name in movie.Actor %}{% if not loop.first %}, {% endif %}<a href="../search/Actor/{{ name }}">{{ name }}</a>{% endfor %}</td>
-		</tr>
-		<tr>
-			<td>Plot</td>
-			<td>{{ movie.Plot }}</td>
-		</tr>
-		<tr>
-			<td>ReleaseDate</td>
-			<td>{{ movie.ReleaseDate }}</td>
-		</tr>
-		<tr>
-			<td>MovieID</td>
-			<td>{{ movie.MovieID }}</td>
-		</tr>
+	<!--
+			<tr>
+				<td>PurchaseDate</td>
+				<td>{{ movie.PurchaseDate }}</td>
+			</tr>
+			<tr>
+				<td>Seen</td>
+				<td>{{ movie.Seen }}</td>
+			</tr>
+	-->
 
-		{% if movie.Notes != "" %}
-		<tr>
-			<td>Notes</td>
-			<td>{{ movie.Notes }}</td>
-		</tr>
-		{% endif %}
+			{% if movie.Rating != "0" %}
+			<tr>
+				<td>Rating</td>
+				<td>{{ movie.Rating }}</td>
+			</tr>
+			{% endif %}
 
-		{% if movie.Position != "" %}
-		<tr>
-			<td>Position</td>
-			<td>{{ movie.Position }}</td>
-		</tr>
-		{% endif %}
+	<!--
+			<tr>
+				<td>Status</td>
+				<td>{{ movie.Status }}</td>
+			</tr>
+	-->
+			<tr>
+				<td>Plot</td>
+				<td>{{ movie.Plot }}</td>
+			</tr>
+			<tr>
+				<td>ReleaseDate</td>
+				<td>{{ movie.ReleaseDate }}</td>
+			</tr>
+
+	<!--
+			<tr>
+				<td>MovieID</td>
+				<td>{{ movie.MovieID }}</td>
+			</tr>
+	-->
+
+			{% if movie.Notes != "" %}
+			<tr>
+				<td>Notes</td>
+				<td>{{ movie.Notes }}</td>
+			</tr>
+			{% endif %}
+
+			{% if movie.Position != "" %}
+			<tr>
+				<td>Position</td>
+				<td>{{ movie.Position }}</td>
+			</tr>
+			{% endif %}
+		</tbody>
 	</table>
 	<br />
 	<button class="btn btn-primary btn-medium" onClick="history.back()"></i> Back</button>
