@@ -131,6 +131,7 @@ def show_problems():
     failMovies = []
     for movie in movieData:
         missing = {}
+        print movie['Title']
         missing['name'] = movie['Title']
         missing['index'] = movie['index']
         missing['missingFields'] = []
