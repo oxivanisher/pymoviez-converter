@@ -72,7 +72,7 @@ def calc_stats(moviesList):
     return (stats, actor, genre, director)
 
 # flask error handlers
-@app.errorhandler(404)
+@serverApp.errorhandler(404)
 def not_found(error):
     resp = make_response(render_template('error.html'), 404)
     return resp
