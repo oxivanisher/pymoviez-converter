@@ -137,6 +137,8 @@ def show_problems():
 
         for field in requiredFields:
             if movie[field] != "":
+                print "data: %s" % movie[field]
+                print "missing field: %s" % field
                 missing['missingFields'].append(field)
 
         if len(missing['missingFields']) > 0:
