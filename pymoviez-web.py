@@ -102,7 +102,10 @@ def show_index():
 def show_search(field, token):
     resultList = []
     for movie in moviesList:
-        if token in movie[field]:
+        if isinstance(movie[field], int):
+            if movie[field] == token:
+                resultList.append(movie)
+        elif token in movie[field]:
             resultList.append(movie)
     return flask.render_template('search_result.html', movies = resultList, field = field, token = token)
 
@@ -157,10 +160,7 @@ if __name__ == '__main__':
             (stats, actor, genre, director) = calc_stats(moviesList)
 
             for movieData in moviesList:
-                # movieData['Directortring'] = ', '.join(movieData['Director'])
-                # movieData['ActorString'] = ', '.join(movieData['Actor'])
                 movieData['MediaString'] = ', '.join(movieData['Medium'])
-                # movieData['Genretring'] = ', '.join(movieData['Genre'])
                 movieData['index'] = moviesList.index(movieData)
 
             print "Loaded %s movies" % len(moviesList)
