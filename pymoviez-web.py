@@ -90,15 +90,15 @@ def show_search(field, token):
 
 @serverApp.route('/genre')
 def show_genre():
-    return flask.render_template('2_colum_table.html', data = genre)
+    return flask.render_template('2_colum_table.html', data = genre, searchToken = "Genre")
 
 @serverApp.route('/director')
 def show_director():
-    return flask.render_template('2_colum_table.html', data = director)
+    return flask.render_template('2_colum_table.html', data = director, searchToken = "Director")
 
 @serverApp.route('/actor')
 def show_actor():
-    return flask.render_template('2_colum_table.html', data = actor)
+    return flask.render_template('2_colum_table.html', data = actor, searchToken = "Actor")
 
 @serverApp.route('/statistics')
 def show_statistics():
