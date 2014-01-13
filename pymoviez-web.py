@@ -129,7 +129,7 @@ def show_statistics():
 def show_problems():
     requiredFields = get_needed_fields()
     failMovies = []
-    for movie in movieData:
+    for movie in moviesList:
         missing = {}
         print movie
         print movie['Title']
