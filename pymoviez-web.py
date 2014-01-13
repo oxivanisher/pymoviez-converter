@@ -20,6 +20,25 @@ serverApp = flask.Flask(__name__)
 serverApp.secret_key = os.urandom(24)
 serverApp.debug = True
 
+def calc_stats(moviesList):
+    stats = {}
+    stats['movieCount'] = len(moviesList)
+
+    media = []
+    allMedia = []
+    for movie in moviesList:
+        for medium in movie['Medium']:
+            allMedia.append(medium)
+        media = list(set(allMedia))
+
+    for i in xrange(len(media)):
+        media[i] = (media[i], allMedia.count(media[i]))
+
+    stats['media'] = media
+    stats['numMedia'] = len(media)
+
+    return stats    
+
 @serverApp.route('/')
 def show_index():
     return flask.render_template('index.html', movies = moviesList)
@@ -87,24 +106,6 @@ def show_actor():
 
 @serverApp.route('/statistics')
 def show_statistics():
-    stats = {}
-    stats['movieCount'] = len(moviesList)
-
-    media = []
-    allMedia = []
-    for movie in moviesList:
-        for medium in movie['Medium']:
-            allMedia.append(medium)
-        media = list(set(allMedia))
-
-    for i in xrange(len(media)):
-        media[i] = (media[i], allMedia.count(media[i]))
-
-    stats['dtest'] = [('test', 'ok')]
-
-    stats['media'] = media
-    stats['numMedia'] = len(media)
-
     return flask.render_template('statistics.html', statsData = stats)
 
 @serverApp.route('/movie/<int:movieId>', methods = ['GET'])
@@ -138,6 +139,8 @@ if __name__ == '__main__':
         moviesList = process_xml('output/export.xml')
 
         if moviesList:
+            stats = calc_stats(moviesList)
+
             for movieData in moviesList:
                 movieData['Directortring'] = ', '.join(movieData['Director'])
                 movieData['ActorString'] = ', '.join(movieData['Actor'])
