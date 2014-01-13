@@ -1,34 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Index{% endblock %}
 {% block content %}
-	<h3>Statistics</h3>
-	<table style="width: 30%;">
-		<tr>
-			<td><a href="../">Movies</a></td>
-			<td>{{ statsData.movieCount }}</td>
-		</tr>
-		<tr>
-			<td><a href="../genre">Generes</a></td>
-			<td>{{ statsData.numGenere }}</td>
-		</tr>
-		<tr>
-			<td><a href="../actor">Actors</a></td>
-			<td>{{ statsData.numActor }}</td>
-		</tr>
-		<tr>
-			<td><a href="../director">Directors</a></td>
-			<td>{{ statsData.numDirector }}</td>
-		</tr>
-		<tr>
-			<td>Media Types</td>
-			<td>{{ statsData.numMedium }}</td>
-		</tr>
-	</table>
-
-	<h3>Media types</h3>
-	<table style="width: 30%;">
-		{% for name, count in statsData.media %}
-			<tr><td><a href="search/Medium/{{ name }}">{{ name }}</a></td><td>{{ count }}</td></tr>
-		{% endfor %}	
-	</table>
+	<h3>ERROR 404</h3>
+	Page not found!
 {% endblock %}

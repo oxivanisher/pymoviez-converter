@@ -71,6 +71,7 @@ def calc_stats(moviesList):
 
     return (stats, actor, genre, director)
 
+# urls / paths
 @serverApp.route('/')
 def show_index():
     return flask.render_template('index.html', movies = moviesList)
@@ -79,14 +80,9 @@ def show_index():
 def show_search(field, token):
     resultList = []
     for movie in moviesList:
-        # if isinstance(movie[field], basestring):
-        #     if movie[field] == token:
-        #         resultList.append(movie)
-        # elif isinstance(movie[field], list):
         if token in movie[field]:
             resultList.append(movie)
-    
-    return flask.render_template('search_result.html', movies = resultList)
+    return flask.render_template('search_result.html', movies = resultList, field = field, token = token)
 
 @serverApp.route('/genre')
 def show_genre():
@@ -106,11 +102,11 @@ def show_statistics():
 
 @serverApp.route('/movie/<int:movieId>', methods = ['GET'])
 def movie_detail(movieId):
-    movieData = moviesList[movieId]
-    # try:
-    return flask.render_template('movie_details.html', movie = movieData)
-    # except 
-    flask.abort(404)
+    try:
+        movieData = moviesList[movieId]
+        return flask.render_template('movie_details.html', movie = movieData)
+    except IndexError:
+        flask.abort(404)
 
 @serverApp.route('/images/<int:movieId>', methods = ['GET'])
 def get_cover(movieId):
@@ -127,6 +123,13 @@ def get_static(fileName, folderName):
     else:
         flask.abort(404)
 
+# error pages
+@app.errorhandler(404)
+def not_found(error):
+    resp = make_response(render_template('error.html'), 404)
+    return resp
+
+# main loop
 if __name__ == '__main__':
 
     if not moviesList:
