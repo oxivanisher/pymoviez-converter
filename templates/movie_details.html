@@ -97,14 +97,19 @@
 				<td>{{ movie.Status }}</td>
 			</tr>
 	-->
+			{% if movie.Plot != "" %}
 			<tr>
 				<td>Plot</td>
 				<td>{{ movie.Plot }}</td>
 			</tr>
+			{% endif %}
+
+			{% if movie.ReleaseDate != "" %}
 			<tr>
 				<td>ReleaseDate</td>
 				<td>{{ movie.ReleaseDate }}</td>
 			</tr>
+			{% endif %}
 
 	<!--
 			<tr>
