@@ -15,15 +15,23 @@ from pymoviez import *
 HOST='127.0.0.1'
 PORT=12000
 
-movies_dict = None
+moviesList = None
 serverApp = flask.Flask(__name__)
 serverApp.secret_key = os.urandom(24)
 serverApp.debug = True
 
 @serverApp.route('/')
-@serverApp.route('/index')
-def hello_world():
-    return flask.render_template('index.html', movies = movies_dict)
+def show_index():
+    return flask.render_template('index.html', movies = moviesList)
+
+@serverApp.route('/search/<string:field>/<string:token>', methods = ['GET'])
+def show_search(field, token):
+    resultList = []
+    for movie in moviesList:
+        if movie[field] == token:
+            resultList.append(movie)
+    
+    return flask.render_template('index.html', movies = resultList)
 
 @serverApp.route('/genre')
 def show_genre():
@@ -31,7 +39,7 @@ def show_genre():
     genre = []
     allGenre = []
 
-    for movie in movies_dict:
+    for movie in moviesList:
         for genre in movie['Genre']:
             allGenre.append(genre)
         genre = list(set(allGenre))
@@ -47,7 +55,7 @@ def show_director():
     director = []
     allDirector = []
 
-    for movie in movies_dict:
+    for movie in moviesList:
         for director in movie['Director']:
             allDirector.append(director)
         director = list(set(allDirector))
@@ -63,7 +71,7 @@ def show_actor():
     actor = []
     allActor = []
 
-    for movie in movies_dict:
+    for movie in moviesList:
         for actor in movie['Actor']:
             allActor.append(actor)
         actor = list(set(allActor))
@@ -76,12 +84,12 @@ def show_actor():
 @serverApp.route('/statistics')
 def show_statistics():
     stats = {}
-    stats['movieCount'] = len(movies_dict)
+    stats['movieCount'] = len(moviesList)
 
     media = []
     allMedia = []
-    for movie in movies_dict:
-        for medium in movie['Media']:
+    for movie in moviesList:
+        for medium in movie['Medium']:
             allMedia.append(medium)
         media = list(set(allMedia))
 
@@ -97,7 +105,7 @@ def show_statistics():
 
 @serverApp.route('/movie/<int:movieId>', methods = ['GET'])
 def movie_detail(movieId):
-    movieData = movies_dict[movieId]
+    movieData = moviesList[movieId]
     # try:
     return flask.render_template('movie_details.html', movie = movieData)
     # except 
@@ -105,7 +113,7 @@ def movie_detail(movieId):
 
 @serverApp.route('/images/<int:movieId>', methods = ['GET'])
 def get_cover(movieId):
-    cover = movies_dict[movieId]['Cover']
+    cover = moviesList[movieId]['Cover']
     if cover:
         return flask.send_from_directory('output', cover)
     else:
@@ -120,21 +128,21 @@ def get_static(fileName, folderName):
 
 if __name__ == '__main__':
 
-    if not movies_dict:
+    if not moviesList:
         output_dir = "output/"
         xml_file_path = process_zip('movies.zip', output_dir)
-        movies_dict = process_xml('output/export.xml')
+        moviesList = process_xml('output/export.xml')
 
-        if movies_dict:
-            for movieData in movies_dict:
+        if moviesList:
+            for movieData in moviesList:
                 movieData['Directortring'] = ', '.join(movieData['Director'])
                 movieData['Actortring'] = ', '.join(movieData['Actor'])
                 movieData['MediaString'] = ', '.join(movieData['Medium'])
                 movieData['Genretring'] = ', '.join(movieData['Genre'])
-                movieData['index'] = movies_dict.index(movieData)
+                movieData['index'] = moviesList.index(movieData)
 
-            print "Loaded %s movies" % len(movies_dict)
-            # print movies_dict
+            print "Loaded %s movies" % len(moviesList)
+            # print moviesList
 
             # go into endless loop
             # serverApp.run(host='0.0.0.0')
