@@ -125,6 +125,25 @@ def show_actor():
 def show_statistics():
     return flask.render_template('statistics.html', statsData = stats)
 
+@serverApp.route('/problems')
+def show_problems():
+    requiredFields = get_needed_fields()
+    failMovies = []
+    for movie in movieData:
+        missing = {}
+        missing['name'] = movie['Title']
+        missing['index'] = movie['index']
+        missing['missingFields'] = []
+
+        for field in requiredFields:
+            if movie[field] != "":
+                missing['missingFields'].append()
+
+        if len(missing['missingFields']) > 0:
+            failMovies.append(missing)
+
+    return flask.render_template('problem_movies.html', movieData = failMovies)
+
 @serverApp.route('/movie/<int:movieId>', methods = ['GET'])
 def movie_detail(movieId):
     try:

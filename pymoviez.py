@@ -9,12 +9,14 @@ import os.path
 import xml.etree.ElementTree as ET
 
 # http://stackoverflow.com/questions/7806563/how-to-unzip-a-zip-file-with-python-2-4
+def get_needed_fields():
+        return ['Title', 'MovieID', 'Medium', 'Year', 'Genre', 'Director', 'Actor', 'Cover', 'Country', 'Length', 'MPAA', 'Plot', 'ReleaseDate']
 
 def get_movie_attribs(movie):
     textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position']
     listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
     intAttributes  = ['Year']
-    neededFields   = ['Title', 'MovieID', 'Medium']
+    neededFields = get_needed_fields()
     movieData = {}
     unknownTags = []
 

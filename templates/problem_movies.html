@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+{% block content %}
+	<h3>Problem Movies</h3>
+	<table>
+		<tbody valign="top">
+			{% for movie in movieData %}
+			<tr>
+				<td><a href="../movie/{{ movie.index }}">{{ movie.name }}</a></td>
+				<td>{% for field in movie.missingFields %}{% if not loop.first %}, {% endif %}{{ field }}{% endfor %}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
