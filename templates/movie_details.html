@@ -39,23 +39,36 @@
 				<td>Length</td>
 				<td>{{ movie.Length }} min</td>
 			</tr>
+
+			{% if movie.Country != "" %}
 			<tr>
 				<td>Country</td>
 				<td><a href="../search/Country/{{ movie.Country }}">{{ movie.Country }}</a></td>
 			</tr>
+			{% endif %}
+
+			{% if movie.Director|length == 0}
 			<tr>
 				<td>Directors</td>
 				<td>{% for name in movie.Director %}{% if not loop.first %}, {% endif %}<a href="../search/Director/{{ name }}">{{ name }}</a>{% endfor %}</td>
 			</tr>
+			{% endif %}
+
+			{% if movie.Actor|length == 0}
 			<tr>
 				<td>Actors</td>
 				<td>{% for name in movie.Actor %}{% if not loop.first %}, {% endif %}<a href="../search/Actor/{{ name }}">{{ name }}</a>{% endfor %}</td>
 			</tr>
+			{% endif %}
+
+			{% if movie.MPAA != "" %}
 			<tr>
 				<td>MPAA</td>
 				<td><a href="../search/MPAA/{{ movie.MPAA }}">{{ movie.MPAA }}</a></td>
 			</tr>
+			{% endif %}
 
+	<!--
 			{% if movie.PersonalRating != "0" %}
 			<tr>
 				<td>PersonalRating</td>
@@ -63,7 +76,6 @@
 			</tr>
 			{% endif %}
 
-	<!--
 			<tr>
 				<td>PurchaseDate</td>
 				<td>{{ movie.PurchaseDate }}</td>
@@ -72,7 +84,6 @@
 				<td>Seen</td>
 				<td>{{ movie.Seen }}</td>
 			</tr>
-	-->
 
 			{% if movie.Rating != "0" %}
 			<tr>
@@ -81,7 +92,6 @@
 			</tr>
 			{% endif %}
 
-	<!--
 			<tr>
 				<td>Status</td>
 				<td>{{ movie.Status }}</td>
