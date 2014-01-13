@@ -19,16 +19,21 @@
 			<td>Genre</td>
 			<td>{% for name in movie.Genre %}{% if not loop.first %}, {% endif %}<a href="../search/Genre/{{ name }}">{{ name }}</a>{% endfor %}</td>
 		</tr>
+
+		{% if movie.URL != "" %}
 		<tr>
 			<td>URL</td>
 			<td><a href="{{ movie.URL }}" target="_blank">{{ movie.URL }}</a></td>
 		</tr>
+		{% endif %}
+
 		{% if movie.Loaned != "" %}
 		<tr>
 			<td>Loaned to</td>
 			<td>{{ movie.Loaned }} since {{ movie.LoanDate }}</td>
 		</tr>
 		{% endif %}
+
 		<tr>
 			<td>Length</td>
 			<td>{{ movie.Length }} min</td>
@@ -45,10 +50,14 @@
 			<td>MPAA</td>
 			<td><a href="../search/MPAA/{{ movie.MPAA }}">{{ movie.MPAA }}</a></td>
 		</tr>
+
+		{% if movie.PersonalRating != "" %}
 		<tr>
 			<td>PersonalRating</td>
 			<td>{{ movie.PersonalRating }}</td>
 		</tr>
+		{% endif %}
+
 		<tr>
 			<td>PurchaseDate</td>
 			<td>{{ movie.PurchaseDate }}</td>
@@ -81,14 +90,20 @@
 			<td>MovieID</td>
 			<td>{{ movie.MovieID }}</td>
 		</tr>
+
+		{% if movie.Notes != "" %}
 		<tr>
 			<td>Notes</td>
 			<td>{{ movie.Notes }}</td>
 		</tr>
+		{% endif %}
+
+		{% if movie.Position != "" %}
 		<tr>
 			<td>Position</td>
 			<td>{{ movie.Position }}</td>
 		</tr>
+		{% rendif %}
 	</table>
 	<br />
 	<button class="btn btn-primary btn-medium" onClick="history.back()"></i> Back</button>
