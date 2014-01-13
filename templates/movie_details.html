@@ -21,7 +21,7 @@
 		</tr>
 		<tr>
 			<td>URL</td>
-			<td>{{ movie.URL }}</td>
+			<td><a href="{{ movie.URL }}" target="_blank">{{ movie.URL }}</a></td>
 		</tr>
 		<tr>
 			<td>Loaned to</td>
@@ -41,7 +41,7 @@
 		</tr>
 		<tr>
 			<td>MPAA</td>
-			<td>{{ movie.MPAA }}</td>
+			<td><a href="../search/MPAA/{{ movie.MPAA }}">{{ movie.MPAA }}</a></td>
 		</tr>
 		<tr>
 			<td>PersonalRating</td>
