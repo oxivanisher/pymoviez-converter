@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Index{% endblock %}
 {% block content %}
-	<h3>Missing Movie Data</h3>
+	<h3>Missing {{ numProblemFields }} fields from {{ numProblemMovies }} Movies</h3>
 	Checking fields: {% for field in neededFields %}{% if not loop.first %}, {% endif %}{{ field }}{% endfor %}
 	<table>
 		<tbody valign="top">

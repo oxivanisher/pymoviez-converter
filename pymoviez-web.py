@@ -129,6 +129,7 @@ def show_statistics():
 def show_problems():
     requiredFields = get_needed_fields()
     failMovies = []
+    fieldCount = 0
     for movie in moviesList:
         missing = {}
         missing['name'] = movie['Title']
@@ -138,11 +139,12 @@ def show_problems():
         for field in requiredFields:
             if not movie[field]:
                 missing['missingFields'].append(field)
+                fieldCount += 1
 
         if len(missing['missingFields']) > 0:
             failMovies.append(missing)
 
-    return flask.render_template('problem_movies.html', movieData = failMovies, neededFields = requiredFields)
+    return flask.render_template('problem_movies.html', movieData = failMovies, neededFields = requiredFields, numProblemMovies = len(failMovies), numProblemFields = fieldCount)
 
 @serverApp.route('/movie/<int:movieId>', methods = ['GET'])
 def movie_detail(movieId):
