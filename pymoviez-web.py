@@ -35,7 +35,7 @@ def show_search(field, token):
         if token in movie[field]:
             resultList.append(movie)
     
-    return flask.render_template('index.html', movies = resultList)
+    return flask.render_template('search_result.html', movies = resultList)
 
 @serverApp.route('/genre')
 def show_genre():
