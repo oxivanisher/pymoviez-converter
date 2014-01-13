@@ -140,7 +140,7 @@ if __name__ == '__main__':
         if moviesList:
             for movieData in moviesList:
                 movieData['Directortring'] = ', '.join(movieData['Director'])
-                movieData['Actortring'] = ', '.join(movieData['Actor'])
+                movieData['ActorString'] = ', '.join(movieData['Actor'])
                 movieData['MediaString'] = ', '.join(movieData['Medium'])
                 movieData['Genretring'] = ', '.join(movieData['Genre'])
                 movieData['index'] = moviesList.index(movieData)
