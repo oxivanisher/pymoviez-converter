@@ -74,7 +74,7 @@ def calc_stats(moviesList):
 # flask error handlers
 @serverApp.errorhandler(404)
 def not_found(error):
-    return render_template('error.html'), 404
+    return flask.render_template('error.html'), 404
 
 # flask urls / paths
 @serverApp.route('/')
