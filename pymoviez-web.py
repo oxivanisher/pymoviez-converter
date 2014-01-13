@@ -142,7 +142,7 @@ def show_problems():
         if len(missing['missingFields']) > 0:
             failMovies.append(missing)
 
-    return flask.render_template('problem_movies.html', movieData = failMovies)
+    return flask.render_template('problem_movies.html', movieData = failMovies, neededFields = requiredFields)
 
 @serverApp.route('/movie/<int:movieId>', methods = ['GET'])
 def movie_detail(movieId):
