@@ -28,7 +28,11 @@ def show_index():
 def show_search(field, token):
     resultList = []
     for movie in moviesList:
-        if movie[field] == token:
+        # if isinstance(movie[field], basestring):
+        #     if movie[field] == token:
+        #         resultList.append(movie)
+        # elif isinstance(movie[field], list):
+        if token in movie[field]:
             resultList.append(movie)
     
     return flask.render_template('index.html', movies = resultList)
