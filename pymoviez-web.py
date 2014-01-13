@@ -131,15 +131,13 @@ def show_problems():
     failMovies = []
     for movie in moviesList:
         missing = {}
-        print movie
-        print movie['Title']
         missing['name'] = movie['Title']
-        missing['index'] = movie['index']
+        missing['index'] = moviesList.index(movieData)
         missing['missingFields'] = []
 
         for field in requiredFields:
             if movie[field] != "":
-                missing['missingFields'].append()
+                missing['missingFields'].append(field)
 
         if len(missing['missingFields']) > 0:
             failMovies.append(missing)
