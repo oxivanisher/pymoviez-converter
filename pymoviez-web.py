@@ -26,18 +26,50 @@ def calc_stats(moviesList):
 
     media = []
     allMedia = []
+    actor = []
+    allActor = []
+    genre = []
+    allGenre = []
+    director = []
+    allDirector = []
+
     for movie in moviesList:
+        # calculate media stats
         for medium in movie['Medium']:
             allMedia.append(medium)
         media = list(set(allMedia))
 
+        # calculate actor stats
+        for actor in movie['Actor']:
+            allActor.append(actor)
+        actor = list(set(allActor))
+
+        # calculate genere stats
+        for genre in movie['Genre']:
+            allGenre.append(genre)
+        genre = list(set(allGenre))
+
+        # calculate director stats
+        for director in movie['Director']:
+            allDirector.append(director)
+        director = list(set(allDirector))
+
     for i in xrange(len(media)):
         media[i] = (media[i], allMedia.count(media[i]))
+    for i in xrange(len(actor)):
+        actor[i] = (actor[i], allActor.count(actor[i]))
+    for i in xrange(len(genre)):
+        genre[i] = (genre[i], allGenre.count(genre[i]))
+    for i in xrange(len(director)):
+        director[i] = (director[i], allDirector.count(director[i]))
 
     stats['media'] = media
-    stats['numMedia'] = len(media)
+    stats['numMedium'] = len(media)
+    stats['numActor'] = len(actor)
+    stats['numGenere'] = len(genre)
+    stats['numDirector'] = len(director)
 
-    return stats    
+    return (stats, actor, genre, director)
 
 @serverApp.route('/')
 def show_index():
@@ -58,50 +90,14 @@ def show_search(field, token):
 
 @serverApp.route('/genre')
 def show_genre():
-    stats = {}
-    genre = []
-    allGenre = []
-
-    for movie in moviesList:
-        for genre in movie['Genre']:
-            allGenre.append(genre)
-        genre = list(set(allGenre))
-
-    for i in xrange(len(genre)):
-        genre[i] = (genre[i], allGenre.count(genre[i]))
-
     return flask.render_template('2_colum_table.html', data = genre)
 
 @serverApp.route('/director')
 def show_director():
-    stats = {}
-    director = []
-    allDirector = []
-
-    for movie in moviesList:
-        for director in movie['Director']:
-            allDirector.append(director)
-        director = list(set(allDirector))
-
-    for i in xrange(len(director)):
-        director[i] = (director[i], allDirector.count(director[i]))
-
     return flask.render_template('2_colum_table.html', data = director)
 
 @serverApp.route('/actor')
 def show_actor():
-    stats = {}
-    actor = []
-    allActor = []
-
-    for movie in moviesList:
-        for actor in movie['Actor']:
-            allActor.append(actor)
-        actor = list(set(allActor))
-
-    for i in xrange(len(actor)):
-        actor[i] = (actor[i], allActor.count(actor[i]))
-
     return flask.render_template('2_colum_table.html', data = actor)
 
 @serverApp.route('/statistics')
@@ -139,7 +135,7 @@ if __name__ == '__main__':
         moviesList = process_xml('output/export.xml')
 
         if moviesList:
-            stats = calc_stats(moviesList)
+            (stats, actor, genre, director) = calc_stats(moviesList)
 
             for movieData in moviesList:
                 movieData['Directortring'] = ', '.join(movieData['Director'])

@@ -8,15 +8,27 @@
 			<td>{{ statsData.movieCount }}</td>
 		</tr>
 		<tr>
+			<td>Number of Generes</td>
+			<td>{{ statsData.numGenere }}</td>
+		</tr>
+		<tr>
+			<td>Number of Actors</td>
+			<td>{{ statsData.numActor }}</td>
+		</tr>
+		<tr>
+			<td>Number of Directors</td>
+			<td>{{ statsData.numDirector }}</td>
+		</tr>
+		<tr>
 			<td>Number of Media Types</td>
-			<td>{{ statsData.numMedia }}</td>
+			<td>{{ statsData.numMedium }}</td>
 		</tr>
 	</table>
 
 	<h3>Media types</h3>
 	<table>
 		{% for name, count in statsData.media %}
-			<tr><td>{{ name }}</td><td>{{ count }}</td></tr>
+			<tr><td><a href="search/Medium/{{ name }}">{{ name }}</a></td><td>{{ count }}</td></tr>
 		{% endfor %}	
 	</table>
 {% endblock %}
