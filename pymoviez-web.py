@@ -77,7 +77,7 @@ def not_found(error):
     resp = make_response(render_template('error.html'), 404)
     return resp
 
-# flask urls / paths
+# flask urls / paths
 @serverApp.route('/')
 def show_index():
     return flask.render_template('index.html', movies = moviesList)
