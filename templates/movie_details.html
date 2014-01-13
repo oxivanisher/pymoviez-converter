@@ -65,9 +65,7 @@
 		</tr>
 		<tr>
 			<td>Actors</td>
-			<td>{% for name in movie.Actor %}
-				<a href="../search/Actor/{{ name }}">{{ name }}</a>
-			{% endfor %}</td>
+			<td>{% for name in movie.Actor %}{% if not loop.first %}, {% endif %}<a href="../search/Actor/{{ name }}">{{ name }}</a>{% endfor %}</td>
 		</tr>
 		<tr>
 			<td>Plot</td>
