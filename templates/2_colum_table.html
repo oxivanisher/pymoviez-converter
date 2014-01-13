@@ -15,8 +15,8 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% for name, count in data %}
-			<tr><td><a href="../search/{{ searchToken }}/{{ name }}">{{ name }}</a></td><td><span title="hover">{{ count }}</span></td></tr>
+		{% for name, count, content in data %}
+			<tr><td><a href="../search/{{ searchToken }}/{{ name }}">{{ name }}</a></td><td><span title="{{ content }}">{{ count }}</span></td></tr>
 		{% endfor %}	
 	</tbody>
 </table>

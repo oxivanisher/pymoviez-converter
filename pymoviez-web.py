@@ -26,12 +26,17 @@ def calc_stats(moviesList):
 
     media = []
     allMedia = []
+
     actor = []
     allActor = []
     genre = []
     allGenre = []
     director = []
     allDirector = []
+
+    actorToMovie = {}
+    genereToMovie = {}
+    directorToMovie = {}
 
     for movie in moviesList:
         # calculate media stats
@@ -42,6 +47,10 @@ def calc_stats(moviesList):
         # calculate actor stats
         for actor in movie['Actor']:
             allActor.append(actor)
+            if actor in actorToMovie.keys():
+                actorToMovie[actor].append(movie['Title'])
+            else:
+                actorToMovie[actor] = [movie['Title']]
         actor = sorted(list(set(allActor)))
 
         # calculate genere stats
@@ -57,11 +66,11 @@ def calc_stats(moviesList):
     for i in xrange(len(media)):
         media[i] = (media[i], allMedia.count(media[i]))
     for i in xrange(len(actor)):
-        actor[i] = (actor[i], allActor.count(actor[i]))
+        actor[i] = (actor[i], allActor.count(actor[i]), actorToMovie[actor[i]])
     for i in xrange(len(genre)):
-        genre[i] = (genre[i], allGenre.count(genre[i]))
+        genre[i] = (genre[i], allGenre.count(genre[i]), "nope")
     for i in xrange(len(director)):
-        director[i] = (director[i], allDirector.count(director[i]))
+        director[i] = (director[i], allDirector.count(director[i]), "nope")
 
     stats['media'] = media
     stats['numMedium'] = len(media)
