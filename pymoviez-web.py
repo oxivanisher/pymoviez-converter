@@ -71,7 +71,13 @@ def calc_stats(moviesList):
 
     return (stats, actor, genre, director)
 
-# urls / paths
+# flask error handlers
+@app.errorhandler(404)
+def not_found(error):
+    resp = make_response(render_template('error.html'), 404)
+    return resp
+
+# flask urls / paths
 @serverApp.route('/')
 def show_index():
     return flask.render_template('index.html', movies = moviesList)
@@ -122,12 +128,6 @@ def get_static(fileName, folderName):
         return flask.send_from_directory('static/' + folderName, fileName)
     else:
         flask.abort(404)
-
-# error pages
-@app.errorhandler(404)
-def not_found(error):
-    resp = make_response(render_template('error.html'), 404)
-    return resp
 
 # main loop
 if __name__ == '__main__':
