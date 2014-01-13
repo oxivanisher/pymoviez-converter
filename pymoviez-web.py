@@ -103,7 +103,7 @@ def show_search(field, token):
     resultList = []
     for movie in moviesList:
         if isinstance(movie[field], int):
-            if movie[field] == token:
+            if movie[field] == int(token):
                 resultList.append(movie)
         elif token in movie[field]:
             resultList.append(movie)
