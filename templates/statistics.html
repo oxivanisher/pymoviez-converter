@@ -2,25 +2,25 @@
 {% block title %}Index{% endblock %}
 {% block content %}
 	<h3>Statistics</h3>
-	<table>
+	<table style="width: 50%;">
 		<tr>
-			<td><a href="../">Number of Movies</a></td>
+			<td><a href="../">Movies</a></td>
 			<td>{{ statsData.movieCount }}</td>
 		</tr>
 		<tr>
-			<td><a href="../genre">Number of Generes</a></td>
+			<td><a href="../genre">Generes</a></td>
 			<td>{{ statsData.numGenere }}</td>
 		</tr>
 		<tr>
-			<td><a href="../actor">Number of Actors</a></td>
+			<td><a href="../actor">Actors</a></td>
 			<td>{{ statsData.numActor }}</td>
 		</tr>
 		<tr>
-			<td><a href="../director">Number of Directors</a></td>
+			<td><a href="../director">Directors</a></td>
 			<td>{{ statsData.numDirector }}</td>
 		</tr>
 		<tr>
-			<td>Number of Media Types</td>
+			<td>Media Types</td>
 			<td>{{ statsData.numMedium }}</td>
 		</tr>
 	</table>
