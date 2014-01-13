@@ -65,7 +65,9 @@
 		</tr>
 		<tr>
 			<td>Actors</td>
-			<td>{{ movie.ActorString }}</td>
+			<td>{% for name in movie.Actor %}
+				<a href="../search/Actor/{{ name }}">{{ name }}</a>
+			{% endfor %}</td>
 		</tr>
 		<tr>
 			<td>Plot</td>
