@@ -51,7 +51,7 @@
 			<td><a href="../search/MPAA/{{ movie.MPAA }}">{{ movie.MPAA }}</a></td>
 		</tr>
 
-		{% if movie.PersonalRating != 0 %}
+		{% if movie.PersonalRating != "0" %}
 		<tr>
 			<td>PersonalRating</td>
 			<td>{{ movie.PersonalRating }}</td>
