@@ -175,7 +175,7 @@ if __name__ == '__main__':
 
     if not moviesList:
         output_dir = "output/"
-        xml_file_path = process_zip('movies.zip', os.path.join(scriptPath, output_dir))
+        xml_file_path = process_zip(os.path.join(scriptPath, 'movies.zip'), os.path.join(scriptPath, output_dir))
         moviesList = process_xml(os.path.join(scriptPath, 'output/export.xml'))
 
         if moviesList:
