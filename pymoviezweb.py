@@ -171,11 +171,12 @@ def get_static(fileName, folderName):
 
 # main loop
 if __name__ == '__main__':
-    print "ok: %s" % os.path.realpath(__file__)
+    scriptPath = os.path.dirname(os.path.realpath(__file__))
+
     if not moviesList:
         output_dir = "output/"
-        xml_file_path = process_zip('movies.zip', output_dir)
-        moviesList = process_xml('output/export.xml')
+        xml_file_path = process_zip('movies.zip', os.path.join(scriptPath, output_dir))
+        moviesList = process_xml(os.path.join(scriptPath, 'output/export.xml'))
 
         if moviesList:
             (stats, actor, genre, director) = calc_stats(moviesList)
