@@ -1,3 +1,3 @@
 
 from pymoviez import *
-from pymoviez-web import *
+from pymoviezweb import *
