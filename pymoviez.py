@@ -13,6 +13,7 @@ def get_needed_fields():
         return ['Title', 'MovieID', 'Medium', 'Year', 'Genre', 'Director', 'Actor', 'Cover', 'Country', 'Length', 'MPAA', 'Plot', 'ReleaseDate']
 
 def get_movie_attribs(movie):
+    scriptPath = os.path.dirname(os.path.realpath(__file__))
     textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position']
     listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
     intAttributes  = ['Year']
@@ -86,7 +87,7 @@ def get_movie_attribs(movie):
         print "Unknown or empty tags for movie: %s (%s)" % (movieData['Title'], ', '.join(unknownTags))
 
     if movieData['Cover']:
-        if not os.path.isfile("output/" + movieData['Cover']):
+        if not os.path.isfile(os.path.join(scriptPath, "output/", movieData['Cover'])):
             print "Missing Cover for movie: %s" % movieData['Title']
 
     if 'Year' in movieData.keys() < 10:
