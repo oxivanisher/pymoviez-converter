@@ -22,6 +22,7 @@ serverApp.debug = True
 
 def calc_stats(moviesList):
     stats = {}
+    countries = {}
     stats['movieCount'] = len(moviesList)
 
     media = []
@@ -71,6 +72,14 @@ def calc_stats(moviesList):
                 directorToMovie[director] = [movie['Title']]
         director = sorted(list(set(allDirector)))
 
+        # calculate country
+        if not movie['Country']:
+            movie['Country'] = "Unknown"
+        try:
+            countries[movie['Country']] += 1
+        except:
+            countries[movie['Country']] = 1
+
     for i in xrange(len(media)):
         media[i] = (media[i], allMedia.count(media[i]))
     for i in xrange(len(actor)):
@@ -85,6 +94,9 @@ def calc_stats(moviesList):
     stats['numActor'] = len(actor)
     stats['numGenere'] = len(genre)
     stats['numDirector'] = len(director)
+    stats['allCountry'] = []
+    for key in sorted(countries.keys()):
+        stats['allCountry'].append({ 'name': key, 'count': countries[key] })
 
     return (stats, actor, genre, director)
 
