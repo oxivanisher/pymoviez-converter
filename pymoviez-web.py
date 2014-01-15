@@ -98,8 +98,6 @@ def calc_stats(moviesList):
     for key in sorted(countries.keys()):
         stats['allCountry'].append({ 'name': key, 'count': countries[key] })
 
-    print stats['allCountry']
-
     return (stats, actor, genre, director)
 
 # flask error handlers
