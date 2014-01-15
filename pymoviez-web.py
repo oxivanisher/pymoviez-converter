@@ -72,11 +72,12 @@ def calc_stats(moviesList):
                 directorToMovie[director] = [movie['Title']]
         director = sorted(list(set(allDirector)))
 
-        # calculate countries
-        try:
-            stats['allCountry'][movie['Country']] += 1
-        except:
-            stats['allCountry'][movie['Country']] = 1
+        # calculate country
+        if movie['Country']:
+            try:
+                stats['allCountry'][movie['Country']] += 1
+            except:
+                stats['allCountry'][movie['Country']] = 1
 
     for i in xrange(len(media)):
         media[i] = (media[i], allMedia.count(media[i]))
