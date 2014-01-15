@@ -31,4 +31,7 @@
 			<tr><td><a href="search/Medium/{{ name }}">{{ name }}</a></td><td>{{ count }}</td></tr>
 		{% endfor %}	
 	</table>
+
+	<h3>Countries</h3>
+	{% for country in statsData.allCountry %}{% if not loop.first %}, {% endif %}<a href="../search/Country/{{ country }}">{{ country }}</a>{% endfor %}
 {% endblock %}
