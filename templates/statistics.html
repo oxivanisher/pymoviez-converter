@@ -33,5 +33,5 @@
 	</table>
 
 	<h3>Countries</h3>
-	{% for country, count in statsData.allCountry %}{% if not loop.first %}, {% endif %}<a href="../search/Country/{{ country }}">{{ country }} ({{ count }}</a>{% endfor %}
+	{% for country in statsData.allCountry %}{% if not loop.first %}, {% endif %}<a href="../search/Country/{{ country.name }}">{{ country.name }} ({{ country.count }})</a>{% endfor %}
 {% endblock %}
