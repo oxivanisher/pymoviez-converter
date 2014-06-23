@@ -108,7 +108,10 @@ def not_found(error):
 # flask urls / paths
 @serverApp.route('/')
 def show_index():
-    return flask.render_template('index.html', movies = moviesList)
+    if not moviesList:
+        return "Error loading movies!"
+    else:
+        return flask.render_template('index.html', movies = moviesList)
 
 @serverApp.route('/search/<string:field>/<string:token>', methods = ['GET'])
 def show_search(field, token):
