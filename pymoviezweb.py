@@ -200,7 +200,7 @@ if __name__ == '__main__':
                 movieData['MediaString'] = ', '.join(movieData['Medium'])
                 movieData['index'] = moviesList.index(movieData)
 
-            print >> sys.stderr, "Loaded %s movies" % len(moviesList)
+            environ['wsgi.errors'].write("Loaded %s movies" % len(moviesList))
             # print moviesList
 
             # go into endless loop
@@ -209,4 +209,4 @@ if __name__ == '__main__':
             # process = Process(target=serverApp.run(host='0.0.0.0'))
 
         else:
-            print >> sys.stderr, "unrecoverable errors found. exiting!"
+            environ['wsgi.errors'].write("unrecoverable errors found. exiting!")
