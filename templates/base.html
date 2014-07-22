@@ -5,12 +5,12 @@
 		<title>{% block title %}{% endblock %}</title>
 	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	    <!-- Bootstrap -->
-	    <link href="/static/bootstrap/bootstrap.min.css" rel="stylesheet" media="screen">
-	    <link href="/static/bootstrap/bottombar.css" rel="stylesheet" media="all" type="text/css" />
-	    <link href="/static/movietable.css" rel="stylesheet" media="all" type="text/css" />
+	    <link href="{{ url_for('static', filename='bootstrap/bootstrap.min.css') }}" rel="stylesheet" media="screen">
+	    <link href="{{ url_for('static', filename='bootstrap/bottombar.css') }}" rel="stylesheet" media="all" type="text/css" />
+	    <link href="{{ url_for('static', filename='movietable.css') }}" rel="stylesheet" media="all" type="text/css" />
 	    <meta name="description" content="Movie Database">
 	    <meta name="author" content="Marc Urben">
-	    <link rel="shortcut icon" href="/static/favicon.ico">
+	    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 	    <style>
 	      body {
 	        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
@@ -19,10 +19,10 @@
 	    {% endblock %}
 	</head>
 	<body>
-		<script src="http://code.jquery.com/jquery.js"></script>
-	    <script src="/static/bootstrap/bootstrap.min.js"></script>
-	    <script src="/static/jquery/jquery.dataTables.min.js"></script>
-	    <script src="/static/movietable.js"></script>
+		<script src="//code.jquery.com/jquery.js"></script>
+	    <script src="{{ url_for('static', filename='bootstrap/bootstrap.min.js') }}"></script>
+	    <script src="{{ url_for('static', filename='jquery/jquery.dataTables.min.js') }}"></script>
+	    <script src="{{ url_for('static', filename='movietable.js') }}"></script>
 
 	    <div class="navbar navbar-inverse navbar-fixed-top">
 	      <div class="navbar-inner">
@@ -32,15 +32,15 @@
 	            <span class="icon-bar"></span>
 	            <span class="icon-bar"></span>
 	          </button>
-	          <a class="brand" href="/">Movie Database</a>
+	          <a class="brand" href="{{ url_for('show_index') }}">Movie Database</a>
 	          <div class="nav-collapse collapse">
 	            <ul class="nav">
-	              <li class="active"><a href="/">Movie Index</a></li>
-	              <li><a href="/genre">Genres</a></li>
-	              <li><a href="/actor">Actors</a></li>
-	              <li><a href="/director">Directors</a></li>
-	              <li><a href="/statistics">Statistics</a></li>
-	              <li><a href="/problems">Problems</a></li>
+	              <li class="active"><a href="{{ url_for('show_index') }}">Movie Index</a></li>
+	              <li><a href="{{ url_for('show_genre') }}">Genres</a></li>
+	              <li><a href="{{ url_for('show_actor') }}">Actors</a></li>
+	              <li><a href="{{ url_for('show_director') }}">Directors</a></li>
+	              <li><a href="{{ url_for('show_statistics') }}">Statistics</a></li>
+	              <li><a href="{{ url_for('show_problems') }}">Problems</a></li>
 	            </ul>
 	          </div><!--/.nav-collapse -->
 	        </div>

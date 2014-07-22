@@ -9,18 +9,25 @@ import os
 import sys
 import flask
 import signal
+import wsgilog
 
 from pymoviez import *
 
 HOST='127.0.0.1'
 PORT=12000
 
+
 moviesList = None
-serverApp = flask.Flask(__name__)
-serverApp.secret_key = os.urandom(24)
-serverApp.debug = True
+#app = flask.Flask(__name__, static_folder=os.path.join(os.path.dirname(os.path.realpath(__file__)), "static"))
+app = flask.Flask(__name__)
+app_logged_wsgi = wsgilog.WsgiLog(app, tohtml=False, tofile='cloudreg.log', tostream=True, toprint=True)
+app.secret_key = os.urandom(24)
+app.debug = True
+app.config['scriptPath'] = os.path.dirname(os.path.realpath(__file__))
+app.config['outputDir'] = "output/"
 
 def calc_stats(moviesList):
+    moviesList = get_db()
     stats = {}
     countries = {}
     stats['movieCount'] = len(moviesList)
@@ -101,20 +108,22 @@ def calc_stats(moviesList):
     return (stats, actor, genre, director)
 
 # flask error handlers
-@serverApp.errorhandler(404)
+@app.errorhandler(404)
 def not_found(error):
     return flask.render_template('error.html'), 404
 
 # flask urls / paths
-@serverApp.route('/')
+@app.route('/')
 def show_index():
+    moviesList = get_db()
     if not moviesList:
         return "Error loading movies!"
     else:
         return flask.render_template('index.html', movies = moviesList)
 
-@serverApp.route('/search/<string:field>/<string:token>', methods = ['GET'])
+@app.route('/search/<string:field>/<string:token>', methods = ['GET'])
 def show_search(field, token):
+    moviesList = get_db()
     resultList = []
     for movie in moviesList:
         if isinstance(movie[field], int):
@@ -124,24 +133,25 @@ def show_search(field, token):
             resultList.append(movie)
     return flask.render_template('search_result.html', movies = resultList, field = field, token = token)
 
-@serverApp.route('/genre')
+@app.route('/genre')
 def show_genre():
     return flask.render_template('2_colum_table.html', data = genre, searchToken = "Genre")
 
-@serverApp.route('/director')
+@app.route('/director')
 def show_director():
     return flask.render_template('2_colum_table.html', data = director, searchToken = "Director")
 
-@serverApp.route('/actor')
+@app.route('/actor')
 def show_actor():
     return flask.render_template('2_colum_table.html', data = actor, searchToken = "Actor")
 
-@serverApp.route('/statistics')
+@app.route('/statistics')
 def show_statistics():
     return flask.render_template('statistics.html', statsData = stats)
 
-@serverApp.route('/problems')
+@app.route('/problems')
 def show_problems():
+    moviesList = get_db()
     requiredFields = get_needed_fields()
     failMovies = []
     fieldCount = 0
@@ -161,37 +171,45 @@ def show_problems():
 
     return flask.render_template('problem_movies.html', movieData = failMovies, neededFields = requiredFields, numProblemMovies = len(failMovies), numProblemFields = fieldCount)
 
-@serverApp.route('/movie/<int:movieId>', methods = ['GET'])
+@app.route('/movie/<int:movieId>', methods = ['GET'])
 def movie_detail(movieId):
+    moviesList = get_db()
     try:
         movieData = moviesList[movieId]
         return flask.render_template('movie_details.html', movie = movieData)
     except IndexError:
         flask.abort(404)
 
-@serverApp.route('/images/<int:movieId>', methods = ['GET'])
+@app.route('/images/<int:movieId>', methods = ['GET'])
 def get_cover(movieId):
+    moviesList = get_db()
     cover = moviesList[movieId]['Cover']
     if cover:
         return flask.send_from_directory('output', cover)
     else:
         flask.abort(404)
 
-@serverApp.route('/static/<string:folderName>/<string:fileName>', methods = ['GET'])
-def get_static(fileName, folderName):
-    if fileName:
-        return flask.send_from_directory('static/' + folderName, fileName)
-    else:
-        flask.abort(404)
+#@app.route('/static/<string:folderName>/<string:fileName>', methods = ['GET'])
+#def get_static(fileName, folderName):
+#    if fileName:
+#        return flask.send_from_directory('static/' + folderName, fileName)
+#    else:
+#        flask.abort(404)
+
+def get_db():
+    if not hasattr(flask.g, 'moviesList'):
+        flask.g = process_xml(os.path.join(app.config['scriptPath'], 'output/export.xml'))
+    return flask.g
 
 # main loop
 if __name__ == '__main__':
-    scriptPath = os.path.dirname(os.path.realpath(__file__))
+    #scriptPath = os.path.dirname(os.path.realpath(__file__))
 
     if not moviesList:
-        output_dir = "output/"
-        xml_file_path = process_zip(os.path.join(scriptPath, 'movies.zip'), os.path.join(scriptPath, output_dir))
-        moviesList = process_xml(os.path.join(scriptPath, 'output/export.xml'))
+        # output_dir = "output/"
+        xml_file_path = process_zip(os.path.join(app.config['scriptPath'], 'movies.zip'), os.path.join(app.config['scriptPath'], app.config['outputDir']))
+        # moviesList = process_xml(os.path.join(scriptPath, 'output/export.xml'))
+        moviesList = get_db()
 
         if moviesList:
             (stats, actor, genre, director) = calc_stats(moviesList)
@@ -200,13 +218,14 @@ if __name__ == '__main__':
                 movieData['MediaString'] = ', '.join(movieData['Medium'])
                 movieData['index'] = moviesList.index(movieData)
 
-            environ['wsgi.errors'].write("Loaded %s movies" % len(moviesList))
+            print("Loaded %s movies" % len(moviesList))
             # print moviesList
 
             # go into endless loop
-            # serverApp.run(host='0.0.0.0')
-            serverApp.run(host=HOST, port=PORT)
-            # process = Process(target=serverApp.run(host='0.0.0.0'))
+            # app.run(host='0.0.0.0')
+		    #app.run(host=HOST, port=PORT)
+    	    app.run()
+            # process = Process(target=app.run(host='0.0.0.0'))
 
         else:
-            environ['wsgi.errors'].write("unrecoverable errors found. exiting!")
+            print("unrecoverable errors found. exiting!")

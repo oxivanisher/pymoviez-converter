@@ -3,6 +3,7 @@ nbproject/*
 *.sublime-*
 output/*.*
 *.zip
+wsgilog.log
 
 *.py[cod]
 
