@@ -12,10 +12,21 @@
 
 import os
 import sys
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
 import signal
-import wsgilog
-from imdb import IMDb, IMDbError
+
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
+
+try:
+    import wsgilog
+except ImportError:
+    print "Please install the wsgilog lib: pip install wsgilog"
+    sys.exit(2)
+
+try:
+    from imdb import IMDb, IMDbError
+except ImportError:
+    print "Please install the IMDB lib: apt-get install python-imdbpy"
+    sys.exit(2)
 
 from pymoviez import *
 
