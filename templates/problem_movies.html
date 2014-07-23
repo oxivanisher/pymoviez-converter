@@ -7,8 +7,9 @@
 		<tbody valign="top">
 			{% for movie in movieData %}
 			<tr>
-				<td><a href="../movie/{{ movie.index }}">{{ movie.name }}</a></td>
+				<td><a href="{{ url_for('show_movie', movieId=movie.index) }}">{{ movie.name }}</a></td>
 				<td>{% for field in movie.missingFields %}{% if not loop.first %}, {% endif %}{{ field }}{% endfor %}</td>
+				<td><a href="{{ url_for('search_imdb_name', token=movie.name) }}">IMDB</a></td>
 			</tr>
 			{% endfor %}
 		</tbody>

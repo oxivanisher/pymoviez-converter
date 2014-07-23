@@ -4,19 +4,19 @@
 	<h3>Statistics</h3>
 	<table style="width: 300px;">
 		<tr>
-			<td><a href="../">Movies</a></td>
+			<td><a href="{{ url_for('show_index') }}">Movies</a></td>
 			<td>{{ statsData.movieCount }}</td>
 		</tr>
 		<tr>
-			<td><a href="../genre">Generes</a></td>
+			<td><a href="{{ url_for('show_genre') }}">Generes</a></td>
 			<td>{{ statsData.numGenere }}</td>
 		</tr>
 		<tr>
-			<td><a href="../actor">Actors</a></td>
+			<td><a href="{{ url_for('show_actor') }}">Actors</a></td>
 			<td>{{ statsData.numActor }}</td>
 		</tr>
 		<tr>
-			<td><a href="../director">Directors</a></td>
+			<td><a href="{{ url_for('show_director') }}">Directors</a></td>
 			<td>{{ statsData.numDirector }}</td>
 		</tr>
 	</table>
@@ -24,10 +24,10 @@
 	<h3>Media types ({{ statsData.numMedium }})</h3>
 	<table style="width: 300px;">
 		{% for name, count in statsData.media %}
-			<tr><td><a href="search/Medium/{{ name }}">{{ name }}</a></td><td>{{ count }}</td></tr>
+			<tr><td><a href="{{ url_for('show_search', field='Medium', token=name) }}">{{ name }}</a></td><td>{{ count }}</td></tr>
 		{% endfor %}	
 	</table>
 
 	<h3>Countries</h3>
-	{% for country in statsData.allCountry %}{% if not loop.first %}, {% endif %}<a href="../search/Country/{{ country.name }}">{{ country.name }} ({{ country.count }})</a>{% endfor %}
+	{% for country in statsData.allCountry %}{% if not loop.first %}, {% endif %}<a href="{{ url_for('show_search', field='Country', token=country.name) }}">{{ country.name }} ({{ country.count }})</a>{% endfor %}
 {% endblock %}

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
 
 # http://webpy.org/  http://webpy.org/docs/0.3/tutorial
@@ -5,29 +8,26 @@
 #!/usr/bin/env python
 # http://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
 
+# sudo apt-get install python-sqlobject python-imdbpy
+
 import os
 import sys
-import flask
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
 import signal
 import wsgilog
+from imdb import IMDb, IMDbError
 
 from pymoviez import *
 
-HOST='127.0.0.1'
-PORT=12000
-
-
-moviesList = None
-#app = flask.Flask(__name__, static_folder=os.path.join(os.path.dirname(os.path.realpath(__file__)), "static"))
-app = flask.Flask(__name__)
+app = Flask(__name__)
 app_logged_wsgi = wsgilog.WsgiLog(app, tohtml=False, tofile='cloudreg.log', tostream=True, toprint=True)
 app.secret_key = os.urandom(24)
-app.debug = True
+# app.debug = True
+app.config.from_envvar('PYMOVIEZ_CFG', silent=False)
 app.config['scriptPath'] = os.path.dirname(os.path.realpath(__file__))
-app.config['outputDir'] = "output/"
 
 def calc_stats(moviesList):
-    moviesList = get_db()
+    moviesList = get_moviesData()
     stats = {}
     countries = {}
     stats['movieCount'] = len(moviesList)
@@ -110,20 +110,20 @@ def calc_stats(moviesList):
 # flask error handlers
 @app.errorhandler(404)
 def not_found(error):
-    return flask.render_template('error.html'), 404
+    return render_template('error.html'), 404
 
 # flask urls / paths
 @app.route('/')
 def show_index():
-    moviesList = get_db()
+    moviesList = get_moviesData()
     if not moviesList:
         return "Error loading movies!"
     else:
-        return flask.render_template('index.html', movies = moviesList)
+        return render_template('index.html', movies = moviesList)
 
-@app.route('/search/<string:field>/<string:token>', methods = ['GET'])
+@app.route('/Search/<string:field>/<string:token>', methods = ['GET'])
 def show_search(field, token):
-    moviesList = get_db()
+    moviesList = get_moviesData()
     resultList = []
     for movie in moviesList:
         if isinstance(movie[field], int):
@@ -131,27 +131,31 @@ def show_search(field, token):
                 resultList.append(movie)
         elif token in movie[field]:
             resultList.append(movie)
-    return flask.render_template('search_result.html', movies = resultList, field = field, token = token)
+    return render_template('search_result.html', movies = resultList, field = field, token = token)
 
-@app.route('/genre')
+@app.route('/Genre')
 def show_genre():
-    return flask.render_template('2_colum_table.html', data = genre, searchToken = "Genre")
+    (stats, actor, genre, director) = get_moviesStats()
+    return render_template('2_colum_table.html', data = genre, searchToken = "Genre")
 
-@app.route('/director')
+@app.route('/Director')
 def show_director():
-    return flask.render_template('2_colum_table.html', data = director, searchToken = "Director")
+    (stats, actor, genre, director) = get_moviesStats()
+    return render_template('2_colum_table.html', data = director, searchToken = "Director")
 
-@app.route('/actor')
+@app.route('/Actor')
 def show_actor():
-    return flask.render_template('2_colum_table.html', data = actor, searchToken = "Actor")
+    (stats, actor, genre, director) = get_moviesStats()
+    return render_template('2_colum_table.html', data = actor, searchToken = "Actor")
 
-@app.route('/statistics')
+@app.route('/Statistics')
 def show_statistics():
-    return flask.render_template('statistics.html', statsData = stats)
+    (stats, actor, genre, director) = get_moviesStats()
+    return render_template('statistics.html', statsData = stats)
 
-@app.route('/problems')
+@app.route('/Problems')
 def show_problems():
-    moviesList = get_db()
+    moviesList = get_moviesData()
     requiredFields = get_needed_fields()
     failMovies = []
     fieldCount = 0
@@ -169,63 +173,95 @@ def show_problems():
         if len(missing['missingFields']) > 0:
             failMovies.append(missing)
 
-    return flask.render_template('problem_movies.html', movieData = failMovies, neededFields = requiredFields, numProblemMovies = len(failMovies), numProblemFields = fieldCount)
+    return render_template('problem_movies.html', movieData = failMovies, neededFields = requiredFields, numProblemMovies = len(failMovies), numProblemFields = fieldCount)
 
-@app.route('/movie/<int:movieId>', methods = ['GET'])
-def movie_detail(movieId):
-    moviesList = get_db()
+@app.route('/Movie/<int:movieId>', methods = ['GET'])
+def show_movie(movieId):
+    moviesList = get_moviesData()
     try:
         movieData = moviesList[movieId]
-        return flask.render_template('movie_details.html', movie = movieData)
+        return render_template('movie_details.html', movie = movieData)
     except IndexError:
-        flask.abort(404)
+        abort(404)
 
-@app.route('/images/<int:movieId>', methods = ['GET'])
+@app.route('/Images/<int:movieId>', methods = ['GET'])
 def get_cover(movieId):
-    moviesList = get_db()
+    moviesList = get_moviesData()
     cover = moviesList[movieId]['Cover']
     if cover:
-        return flask.send_from_directory('output', cover)
+        return send_from_directory('output', cover)
     else:
-        flask.abort(404)
+        abort(404)
 
-#@app.route('/static/<string:folderName>/<string:fileName>', methods = ['GET'])
-#def get_static(fileName, folderName):
-#    if fileName:
-#        return flask.send_from_directory('static/' + folderName, fileName)
-#    else:
-#        flask.abort(404)
-
-def get_db():
-    if not hasattr(flask.g, 'moviesList'):
-        flask.g = process_xml(os.path.join(app.config['scriptPath'], 'output/export.xml'))
-    return flask.g
-
-# main loop
-if __name__ == '__main__':
-    #scriptPath = os.path.dirname(os.path.realpath(__file__))
-
-    if not moviesList:
-        # output_dir = "output/"
-        xml_file_path = process_zip(os.path.join(app.config['scriptPath'], 'movies.zip'), os.path.join(app.config['scriptPath'], app.config['outputDir']))
-        # moviesList = process_xml(os.path.join(scriptPath, 'output/export.xml'))
-        moviesList = get_db()
-
-        if moviesList:
-            (stats, actor, genre, director) = calc_stats(moviesList)
-
-            for movieData in moviesList:
-                movieData['MediaString'] = ', '.join(movieData['Medium'])
-                movieData['index'] = moviesList.index(movieData)
-
-            print("Loaded %s movies" % len(moviesList))
-            # print moviesList
-
-            # go into endless loop
-            # app.run(host='0.0.0.0')
-		    #app.run(host=HOST, port=PORT)
-    	    app.run()
-            # process = Process(target=app.run(host='0.0.0.0'))
-
+@app.route('/Login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        if request.form['username'] != app.config['USERNAME']:
+            print "Invalid username"
+            flash('Invalid login')
+        elif request.form['password'] != app.config['PASSWORD']:
+            print "Invalid password"
+            flash('Invalid login')
         else:
-            print("unrecoverable errors found. exiting!")
+            print "Logged in"
+            session['logged_in'] = True
+            flash('Logged in')
+            return redirect(url_for('admin'))
+    return render_template('login.html')
+
+@app.route('/Logout')
+def logout():
+    session.pop('logged_in', None)
+    flash('Logged out')
+    return redirect(url_for('show_index'))
+
+@app.route('/Admin')
+def admin():
+    return render_template('index.html', movies = get_moviesData())
+
+@app.route('/LookupName/<string:token>')
+def search_imdb_name(token):
+    ia = IMDb()
+    # s_result = ia.search_movie(token)
+    print "Querying IMDB for movie name: %s" % token
+    try:
+        s_result = ia.search_movie(token)
+        print s_result
+        for item in s_result:
+            print item['long imdb canonical title'], item.movieID
+    except IMDbError, err:
+        print err
+
+
+    return show_index()
+
+def get_moviesData():
+    # saving moviesData to application context since its not going to change
+    with app.app_context():
+        if not hasattr(current_app, 'moviesList'):
+            outputDir = os.path.join(app.config['scriptPath'], app.config['OUTPUTDIR'])
+            xmlFilePath = os.path.join(outputDir, 'export.xml')
+            zipFilePath = os.path.join(app.config['scriptPath'], 'movies.zip')
+
+            if not os.path.isfile(xmlFilePath):
+                print "Processing ZIP file"
+                process_zip(zipFilePath, outputDir)
+
+            print "Loading movies from XML"
+            current_app.moviesList = process_xml(xmlFilePath)
+
+            for movieData in current_app.moviesList:
+                movieData['MediaString'] = ', '.join(movieData['Medium'])
+                movieData['index'] = current_app.moviesList.index(movieData)
+        return current_app.moviesList
+
+def get_moviesStats():
+    # saving moviesStats to application context since its not going to change
+    with app.app_context():
+        if not hasattr(current_app, 'moviesStats'):
+            print "Calculating statistics"
+            current_app.moviesStats = calc_stats(get_moviesData())
+        return current_app.moviesStats
+
+if __name__ == '__main__':
+    app.run()

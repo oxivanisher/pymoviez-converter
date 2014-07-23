@@ -16,7 +16,7 @@
 	</thead>
 	<tbody>
 		{% for name, count, content in data %}
-			<tr><td><a href="../search/{{ searchToken }}/{{ name }}">{{ name }}</a></td><td><span title="{{ content }}">{{ count }}</span></td></tr>
+			<tr><td><a href="{{ url_for('show_search', field=searchToken, token=name) }}">{{ name }}</a></td><td><span title="{{ content }}">{{ count }}</span></td></tr>
 		{% endfor %}	
 	</tbody>
 </table>

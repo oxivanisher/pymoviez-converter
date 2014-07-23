@@ -4,6 +4,7 @@ nbproject/*
 output/*.*
 *.zip
 wsgilog.log
+pymoviez.cfg
 
 *.py[cod]
 

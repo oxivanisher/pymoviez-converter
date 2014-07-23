@@ -2,22 +2,25 @@ var oTable = undefined;
 var asInitVals = new Array();
 
 function resize_view() {
-	var ciHeight = $(window).height() - 120;
-		/* head, tabs, paginate, offset */
-	var ciAmount = Math.ceil((ciHeight - 180) / 35);
-		/* height - 100 / lineheight */
+	var elementExists = document.getElementById("dt_movietable");
+	if (elementExists) {
+		var ciHeight = $(window).height() - 120;
+			/* head, tabs, paginate, offset */
+		var ciAmount = Math.ceil((ciHeight - 180) / 35);
+			/* height - 100 / lineheight */
 
-	if (ciAmount < 1) ciAmount = 1;
+		if (ciAmount < 1) ciAmount = 1;
 
-	/* send tabs to bottom */
-	$('.tab-content').css('height', ciHeight);
+		/* send tabs to bottom */
+		$('.tab-content').css('height', ciHeight);
 
-	oTable.fnSettings()._iDisplayLength = ciAmount;
-	oTable.fnDraw();
+		oTable.fnSettings()._iDisplayLength = ciAmount;
+		oTable.fnDraw();
+	}
 }
 
 $(document).ready(function(){
-    oTable = $('#dt_movietable').dataTable({
+	oTable = $('#dt_movietable').dataTable({
 		"bLengthChange": false,
 		"sPaginationType": "full_numbers",
 		"fnDrawCallback": function() {
@@ -27,7 +30,7 @@ $(document).ready(function(){
 			$('.dataTables_paginate .last').addClass('btn-inverse');
 			$('.dataTables_paginate .next').addClass('btn-inverse');
 			$('.dataTables_paginate .previous').addClass('btn-inverse');
-	    }
+		}
 	});
 	$("thead input").keyup( function () {
 		oTable.fnFilter( this.value, $("thead input").index(this) );

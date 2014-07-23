@@ -21,10 +21,10 @@
 	<tbody>
 	{% for movie in movies %}
 		<tr>
-			<td><a href="movie/{{movie.index}}">{{movie.Title}}</a></td>
-			<td><a href="search/Year/{{movie.Year}}">{{movie.Year}}</a></td>
-			<td><a href="search/Medium/{{movie.MediaString}}">{{movie.MediaString}}</a></td>
-			<td><a href="search/Loaned/{{movie.Loaned}}">{{movie.Loaned}}</a></td>
+			<td><a href="{{ url_for('show_movie', movieId=movie.index) }}">{{movie.Title}}</a></td>
+			<td><a href="{{ url_for('show_search', field='Year', token=movie.Year) }}">{{movie.Year}}</a></td>
+			<td><a href="{{ url_for('show_search', field='Medium', token=movie.MediaString) }}">{{movie.MediaString}}</a></td>
+			<td><a href="{{ url_for('show_search', field='Loaned', token=movie.Loaned) }}">{{movie.Loaned}}</a></td>
 		</tr>
 	{% endfor %}
 	</tbody>

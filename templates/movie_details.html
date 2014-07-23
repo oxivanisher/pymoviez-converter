@@ -4,21 +4,21 @@
 	<table>
 		<tbody valign="top">
 			<tr>
-				<td rowspan="21" width="400"><img src="../images/{{ movie.index }}"></td>
+				<td rowspan="21" width="400"><img src="{{ url_for('get_cover', movieId=movie.index) }}"></td>
 				<td>Title</td>
 				<td><b>{{ movie.Title }}</b></td>
 			</tr>
 			<tr>
 				<td>Media</td>
-				<td>{% for name in movie.Medium %}{% if not loop.first %}, {% endif %}<a href="../search/Medium/{{ name }}">{{ name }}</a>{% endfor %}</td>
+				<td>{% for name in movie.Medium %}{% if not loop.first %}, {% endif %}<a href="{{ url_for('show_search', field='Medium', token=name) }}">{{ name }}</a>{% endfor %}</td>
 			</tr>
 			<tr>
 				<td>Year</td>
-				<td><a href="../search/Year/{{ movie.Year }}">{{ movie.Year }}</a></td>
+				<td><a href="{{ url_for('show_search', field='Year', token=movie.Year) }}">{{ movie.Year }}</a></td>
 			</tr>
 			<tr>
 				<td>Genre</td>
-				<td>{% for name in movie.Genre %}{% if not loop.first %}, {% endif %}<a href="../search/Genre/{{ name }}">{{ name }}</a>{% endfor %}</td>
+				<td>{% for name in movie.Genre %}{% if not loop.first %}, {% endif %}<a href="{{ url_for('show_search', field='Genre', token=name) }}">{{ name }}</a>{% endfor %}</td>
 			</tr>
 
 			{% if movie.URL != "" %}
@@ -43,28 +43,28 @@
 			{% if movie.Country != "" %}
 			<tr>
 				<td>Country</td>
-				<td><a href="../search/Country/{{ movie.Country }}">{{ movie.Country }}</a></td>
+				<td><a href="{{ url_for('show_search', field='Country', token=movie.Country) }}">{{ movie.Country }}</a></td>
 			</tr>
 			{% endif %}
 
 			{% if movie.Director.length != 0 %}
 			<tr>
 				<td>Directors</td>
-				<td>{% for name in movie.Director %}{% if not loop.first %}, {% endif %}<a href="../search/Director/{{ name }}">{{ name }}</a>{% endfor %}</td>
+				<td>{% for name in movie.Director %}{% if not loop.first %}, {% endif %}<a href="{{ url_for('show_search', field='Director', token=name) }}">{{ name }}</a>{% endfor %}</td>
 			</tr>
 			{% endif %}
 
 			{% if movie.Actor.length != 0 %}
 			<tr>
 				<td>Actors</td>
-				<td>{% for name in movie.Actor %}{% if not loop.first %}, {% endif %}<a href="../search/Actor/{{ name }}">{{ name }}</a>{% endfor %}</td>
+				<td>{% for name in movie.Actor %}{% if not loop.first %}, {% endif %}<a href="{{ url_for('show_search', field='Actor', token=name) }}">{{ name }}</a>{% endfor %}</td>
 			</tr>
 			{% endif %}
 
 			{% if movie.MPAA != "" %}
 			<tr>
 				<td>MPAA</td>
-				<td><a href="../search/MPAA/{{ movie.MPAA }}">{{ movie.MPAA }}</a></td>
+				<td><a href="{{ url_for('show_search', field='MPAA', token=movie.MPAA) }}">{{ movie.MPAA }}</a></td>
 			</tr>
 			{% endif %}
 
