@@ -31,7 +31,7 @@ except ImportError:
 from pymoviez import *
 
 app = Flask(__name__)
-app_logged_wsgi = wsgilog.WsgiLog(app, tohtml=False, tofile='cloudreg.log', tostream=True, toprint=True)
+app_logged_wsgi = wsgilog.WsgiLog(app, tohtml=False, tofile='pymoviez.log', tostream=True, toprint=True)
 app.secret_key = os.urandom(24)
 # app.debug = True
 app.config.from_envvar('PYMOVIEZ_CFG', silent=False)

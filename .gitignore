@@ -3,7 +3,7 @@ nbproject/*
 *.sublime-*
 output/*.*
 *.zip
-wsgilog.log
+wsgilog.log*
 pymoviez.cfg
 
 *.py[cod]

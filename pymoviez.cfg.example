@@ -1,4 +1,0 @@
-DEBUG = True
-OUTPUTDIR = "output"
-USERNAME = "admin"
-PASSWORD = "changeme"
