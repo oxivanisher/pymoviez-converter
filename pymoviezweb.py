@@ -16,11 +16,11 @@ import signal
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
 
-try:
-    import wsgilog
-except ImportError:
-    print "Please install the wsgilog lib: pip install wsgilog"
-    sys.exit(2)
+# try:
+#     import wsgilog
+# except ImportError:
+#     print "Please install the wsgilog lib: pip install wsgilog"
+#     sys.exit(2)
 
 try:
     from imdb import IMDb, IMDbError
@@ -31,11 +31,20 @@ except ImportError:
 from pymoviez import *
 
 app = Flask(__name__)
-app_logged_wsgi = wsgilog.WsgiLog(app, tohtml=False, tofile='pymoviez.log', tostream=True, toprint=True)
+# app_logged_wsgi = wsgilog.WsgiLog(app, tohtml=False, tofile='pymoviez.log', tostream=True, toprint=True)
 app.secret_key = os.urandom(24)
 # app.debug = True
 app.config.from_envvar('PYMOVIEZ_CFG', silent=False)
 app.config['scriptPath'] = os.path.dirname(os.path.realpath(__file__))
+
+if not app.debug:
+    import logging
+    from logging.handlers import SMTPHandler
+    mail_handler = SMTPHandler(app.config['EMAILSERVER'],
+                               app.config['EMAILFROM'],
+                               ADMINS, __name__ + ' failed!')
+    mail_handler.setLevel(logging.ERROR)
+    app.logger.addHandler(mail_handler)
 
 def calc_stats(moviesList):
     moviesList = get_moviesData()
