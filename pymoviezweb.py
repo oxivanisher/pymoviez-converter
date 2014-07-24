@@ -13,36 +13,29 @@
 import os
 import sys
 import signal
+import logging
+
+logging.basicConfig(filename='/tmp/pymoviezweb.log', format='%(asctime)s %(levelname)s:%(message)s', datefmt='%Y-%d-%m %H:%M:%S', level=logging.DEBUG)
+log = logging.getLogger(__name__)
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
-
-# try:
-#     import wsgilog
-# except ImportError:
-#     print "Please install the wsgilog lib: pip install wsgilog"
-#     sys.exit(2)
 
 try:
     from imdb import IMDb, IMDbError
 except ImportError:
-    print "Please install the IMDB lib: apt-get install python-imdbpy"
+    log.error("Please install the IMDB lib: apt-get install python-imdbpy")
     sys.exit(2)
 
 from pymoviez import *
 
 app = Flask(__name__)
-# app_logged_wsgi = wsgilog.WsgiLog(app, tohtml=False, tofile='pymoviez.log', tostream=True, toprint=True)
 app.secret_key = os.urandom(24)
-# app.debug = True
 app.config.from_envvar('PYMOVIEZ_CFG', silent=False)
 app.config['scriptPath'] = os.path.dirname(os.path.realpath(__file__))
 
 if not app.debug:
-    import logging
     from logging.handlers import SMTPHandler
-    mail_handler = SMTPHandler(app.config['EMAILSERVER'],
-                               app.config['EMAILFROM'],
-                               ADMINS, __name__ + ' failed!')
+    mail_handler = SMTPHandler(app.config['EMAILSERVER'], app.config['EMAILFROM'], ADMINS, __name__ + ' failed!')
     mail_handler.setLevel(logging.ERROR)
     app.logger.addHandler(mail_handler)
 
@@ -217,13 +210,13 @@ def get_cover(movieId):
 def login():
     if request.method == 'POST':
         if request.form['username'] != app.config['USERNAME']:
-            print "Invalid username"
+            log.info("Invalid username")
             flash('Invalid login')
         elif request.form['password'] != app.config['PASSWORD']:
-            print "Invalid password"
+            log.info("Invalid password")
             flash('Invalid login')
         else:
-            print "Logged in"
+            log.info("Logged in")
             session['logged_in'] = True
             flash('Logged in')
             return redirect(url_for('admin'))
@@ -243,14 +236,14 @@ def admin():
 def search_imdb_name(token):
     ia = IMDb()
     # s_result = ia.search_movie(token)
-    print "Querying IMDB for movie name: %s" % token
+    log.debug("Querying IMDB for movie name: %s" % token)
     try:
         s_result = ia.search_movie(token)
-        print s_result
+        log.debug(s_result)
         for item in s_result:
-            print item['long imdb canonical title'], item.movieID
+            log.debug(item['long imdb canonical title'], item.movieID)
     except IMDbError, err:
-        print err
+        log.debug(err)
 
 
     return show_index()
@@ -264,10 +257,10 @@ def get_moviesData():
             zipFilePath = os.path.join(app.config['scriptPath'], 'movies.zip')
 
             if not os.path.isfile(xmlFilePath):
-                print "Processing ZIP file"
+                log.info("Processing ZIP file")
                 process_zip(zipFilePath, outputDir)
 
-            print "Loading movies from XML"
+            log.info("Loading movies from XML")
             current_app.moviesList = process_xml(xmlFilePath)
 
             for movieData in current_app.moviesList:
@@ -279,7 +272,7 @@ def get_moviesStats():
     # saving moviesStats to application context since its not going to change
     with app.app_context():
         if not hasattr(current_app, 'moviesStats'):
-            print "Calculating statistics"
+            log.info("Calculating statistics")
             current_app.moviesStats = calc_stats(get_moviesData())
         return current_app.moviesStats
 
