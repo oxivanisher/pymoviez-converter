@@ -249,7 +249,6 @@ def search_imdb_name(token):
     return show_index()
 
 def get_moviesData():
-    # saving moviesData to application context since its not going to change
     if not app.config['moviesList']:
         outputDir = os.path.join(app.config['scriptPath'], app.config['OUTPUTDIR'])
         xmlFilePath = os.path.join(outputDir, 'export.xml')
@@ -268,7 +267,6 @@ def get_moviesData():
     return app.config['moviesList']
 
 def get_moviesStats():
-    # saving moviesStats to application context since its not going to change
     if not app.config['moviesStats']:
         print "Calculating statistics"
         app.config['moviesStats'] = calc_stats(get_moviesData())
