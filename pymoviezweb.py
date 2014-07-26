@@ -270,11 +270,10 @@ def get_moviesData():
     return app.config['moviesList']
 
 def get_moviesStats():
-    with app.app_context():
-        if not app.config['moviesStats']:
-            log.info("Calculating statistics")
-            app.config['moviesStats'] = calc_stats(get_moviesData())
-        return app.config['moviesStats']
+    if not app.config['moviesStats']:
+        log.info("Calculating statistics")
+        app.config['moviesStats'] = calc_stats(get_moviesData())
+    return app.config['moviesStats']
 
 if __name__ == '__main__':
     app.run()
