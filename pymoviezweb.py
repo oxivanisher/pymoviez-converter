@@ -14,7 +14,7 @@ import os
 import sys
 import signal
 
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory
 
 try:
     import wsgilog
@@ -36,6 +36,8 @@ app.secret_key = os.urandom(24)
 # app.debug = True
 app.config.from_envvar('PYMOVIEZ_CFG', silent=False)
 app.config['scriptPath'] = os.path.dirname(os.path.realpath(__file__))
+app.config['moviesList'] = False
+app.config['moviesStats'] = False
 
 def calc_stats(moviesList):
     moviesList = get_moviesData()
@@ -248,31 +250,29 @@ def search_imdb_name(token):
 
 def get_moviesData():
     # saving moviesData to application context since its not going to change
-    with app.app_context():
-        if not hasattr(current_app, 'moviesList'):
-            outputDir = os.path.join(app.config['scriptPath'], app.config['OUTPUTDIR'])
-            xmlFilePath = os.path.join(outputDir, 'export.xml')
-            zipFilePath = os.path.join(app.config['scriptPath'], 'movies.zip')
+    if not app.config['moviesList']:
+        outputDir = os.path.join(app.config['scriptPath'], app.config['OUTPUTDIR'])
+        xmlFilePath = os.path.join(outputDir, 'export.xml')
+        zipFilePath = os.path.join(app.config['scriptPath'], 'movies.zip')
 
-            if not os.path.isfile(xmlFilePath):
-                print "Processing ZIP file"
-                process_zip(zipFilePath, outputDir)
+        if not os.path.isfile(xmlFilePath):
+            print "Processing ZIP file"
+            process_zip(zipFilePath, outputDir)
 
-            print "Loading movies from XML"
-            current_app.moviesList = process_xml(xmlFilePath)
+        print "Loading movies from XML"
+        app.config['moviesList'] = process_xml(xmlFilePath)
 
-            for movieData in current_app.moviesList:
-                movieData['MediaString'] = ', '.join(movieData['Medium'])
-                movieData['index'] = current_app.moviesList.index(movieData)
-        return current_app.moviesList
+        for movieData in app.config['moviesList']:
+            movieData['MediaString'] = ', '.join(movieData['Medium'])
+            movieData['index'] = app.config['moviesList'].index(movieData)
+    return app.config['moviesList']
 
 def get_moviesStats():
     # saving moviesStats to application context since its not going to change
-    with app.app_context():
-        if not hasattr(current_app, 'moviesStats'):
-            print "Calculating statistics"
-            current_app.moviesStats = calc_stats(get_moviesData())
-        return current_app.moviesStats
+    if not app.config['moviesStats']:
+        print "Calculating statistics"
+        app.config['moviesStats'] = calc_stats(get_moviesData())
+    return app.config['moviesStats']
 
 if __name__ == '__main__':
     app.run()
