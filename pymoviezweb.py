@@ -16,7 +16,7 @@ import signal
 import logging
 
 
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
 
 logging.basicConfig(filename='/tmp/pymoviezweb.log', format='%(asctime)s %(levelname)s:%(message)s', datefmt='%Y-%d-%m %H:%M:%S', level=logging.DEBUG)
 log = logging.getLogger(__name__)
@@ -262,7 +262,7 @@ def get_moviesData():
             process_zip(zipFilePath, outputDir)
 
         log.info("Loading movies from XML")
-        current_app.moviesList = process_xml(xmlFilePath)
+        app.config['moviesList'] = process_xml(xmlFilePath)
 
         for movieData in app.config['moviesList']:
             movieData['MediaString'] = ', '.join(movieData['Medium'])
@@ -271,10 +271,10 @@ def get_moviesData():
 
 def get_moviesStats():
     with app.app_context():
-        if not hasattr(current_app, 'moviesStats'):
+        if not app.config['moviesStats']:
             log.info("Calculating statistics")
-            current_app.moviesStats = calc_stats(get_moviesData())
-        return current_app.moviesStats
+            app.config['moviesStats'] = calc_stats(get_moviesData())
+        return app.config['moviesStats']
 
 if __name__ == '__main__':
     app.run()
