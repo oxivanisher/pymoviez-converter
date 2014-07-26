@@ -205,7 +205,7 @@ def get_cover(movieId):
     moviesList = get_moviesData()
     cover = moviesList[movieId]['Cover']
     if cover:
-        return send_from_directory('output', cover)
+        return send_from_directory(os.path.join(app.config['scriptPath'], app.config['OUTPUTDIR']), cover)
     else:
         abort(404)
 
