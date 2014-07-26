@@ -1,7 +1,8 @@
 *.swp
 nbproject/*
 *.sublime-*
-output/*.*
+output/*
+!output/.keep
 *.zip
 wsgilog.log*
 pymoviez.cfg
