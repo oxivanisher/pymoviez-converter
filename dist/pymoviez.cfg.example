@@ -1,11 +1,7 @@
 DEBUG = True
 OUTPUTDIR = "output"
 USERNAME = "admin"
-<<<<<<< HEAD
-PASSWORD = "changeme"
-=======
 PASSWORD = "changeme"
 EMAILTARGET = ['yourname@example.com']
 EMAILSERVER = "127.0.0.1"
 EMAILFROM = "yourname@example.com"
->>>>>>> f609ecd8437c38ada66ceb406ba3930fa21b0542
