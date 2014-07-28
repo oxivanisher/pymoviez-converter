@@ -75,6 +75,7 @@
 				  <li class="{% if url_for('show_statistics') == request.path %}active{% endif %}"><a href="{{ url_for('show_statistics') }}">Statistics</a></li>
 				  {% if session.logged_in %}
 				  <li class="{% if url_for('show_problems') == request.path %}active{% endif %}"><a href="{{ url_for('show_problems') }}">Problems</a></li>
+				  <li class="{% if url_for('admin') == request.path %}active{% endif %}"><a href="{{ url_for('admin') }}">Admin</a></li>
 				  {% endif %}
 				  <li class="{% if url_for('login') == request.path %}active{% endif %}">{% if session.logged_in %}<a href="{{ url_for('logout') }}">Logout</a>{% else %}<a href="{{ url_for('login') }}">Login</a>{% endif %}</li>
 				</ul>

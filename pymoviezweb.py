@@ -179,31 +179,6 @@ def show_statistics():
     (stats, actor, genre, director) = get_moviesStats()
     return render_template('statistics.html', statsData = stats)
 
-@app.route('/Problems')
-def show_problems():
-    if session['logged_in']:
-        moviesList = get_moviesData()
-        requiredFields = get_needed_fields()
-        failMovies = []
-        fieldCount = 0
-        for movie in moviesList:
-            missing = {}
-            missing['name'] = movie['Title']
-            missing['index'] = moviesList.index(movie)
-            missing['missingFields'] = []
-
-            for field in requiredFields:
-                if not movie[field]:
-                    missing['missingFields'].append(field)
-                    fieldCount += 1
-
-            if len(missing['missingFields']) > 0:
-                failMovies.append(missing)
-
-        return render_template('problem_movies.html', movieData = failMovies, neededFields = requiredFields, numProblemMovies = len(failMovies), numProblemFields = fieldCount)
-    else:
-        abort(404)
-
 @app.route('/Movie/<int:movieId>', methods = ['GET'])
 def show_movie(movieId):
     moviesList = get_moviesData()
@@ -226,13 +201,13 @@ def get_cover(movieId):
 def login():
     if request.method == 'POST':
         if request.form['username'] != app.config['USERNAME']:
-            log.info("Invalid username")
+            log.info("Invalid username for %s" % request.form['username'])
             flash('Invalid login')
         elif request.form['password'] != app.config['PASSWORD']:
-            log.info("Invalid password")
+            log.info("Invalid password for %s" % request.form['username'])
             flash('Invalid login')
         else:
-            log.info("Logged in")
+            log.info("%s Logged in" % request.form['username'])
             session['logged_in'] = True
             flash('Logged in')
             return redirect(url_for('admin'))
@@ -246,7 +221,35 @@ def logout():
 
 @app.route('/Admin')
 def admin():
-    return render_template('index.html', movies = get_moviesData())
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    else:
+        return render_template('admin.html')
+
+@app.route('/Problems')
+def show_problems():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    else:
+        moviesList = get_moviesData()
+        requiredFields = get_needed_fields()
+        failMovies = []
+        fieldCount = 0
+        for movie in moviesList:
+            missing = {}
+            missing['name'] = movie['Title']
+            missing['index'] = moviesList.index(movie)
+            missing['missingFields'] = []
+
+            for field in requiredFields:
+                if not movie[field]:
+                    missing['missingFields'].append(field)
+                    fieldCount += 1
+
+            if len(missing['missingFields']) > 0:
+                failMovies.append(missing)
+
+        return render_template('problem_movies.html', movieData = failMovies, neededFields = requiredFields, numProblemMovies = len(failMovies), numProblemFields = fieldCount)
 
 @app.route('/LookupName/<string:token>')
 def search_imdb_name(token):
@@ -263,6 +266,15 @@ def search_imdb_name(token):
 
 
     return show_index()
+
+@app.route('/Admin/ReloadZIP')
+def reload_zip():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    else:
+        app.config['moviesList'] = False
+        app.config['moviesStats'] = False
+        return redirect(url_for('admin'))
 
 def get_moviesData():
     if not app.config['moviesList']:
