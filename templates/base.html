@@ -45,11 +45,18 @@
 					}
 				});
 			});
+            function showPopup(imgSrc) {
+            	$('img#popupimg').attr( "src", imgSrc );
+            	$("#popup").show();
+            }
+            function hidePopup() {
+            	$("#popup").hide();
+            }
 		</script>
 		{% endblock %}
 	</head>
 	<body>
-
+		<div><span id="popup" style="position: fixed; bottom: 30px; right: 10px; display:none;" class="shadow"><img id="popupimg" style="max-width:400px; max-height: 400px; width: auto;" src="" /></span></div>
 		<div class="navbar navbar-inverse navbar-fixed-top">
 		  <div class="navbar-inner">
 			<div class="container">

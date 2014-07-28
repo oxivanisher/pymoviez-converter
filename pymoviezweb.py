@@ -181,25 +181,28 @@ def show_statistics():
 
 @app.route('/Problems')
 def show_problems():
-    moviesList = get_moviesData()
-    requiredFields = get_needed_fields()
-    failMovies = []
-    fieldCount = 0
-    for movie in moviesList:
-        missing = {}
-        missing['name'] = movie['Title']
-        missing['index'] = moviesList.index(movie)
-        missing['missingFields'] = []
+    if session['logged_in']:
+        moviesList = get_moviesData()
+        requiredFields = get_needed_fields()
+        failMovies = []
+        fieldCount = 0
+        for movie in moviesList:
+            missing = {}
+            missing['name'] = movie['Title']
+            missing['index'] = moviesList.index(movie)
+            missing['missingFields'] = []
 
-        for field in requiredFields:
-            if not movie[field]:
-                missing['missingFields'].append(field)
-                fieldCount += 1
+            for field in requiredFields:
+                if not movie[field]:
+                    missing['missingFields'].append(field)
+                    fieldCount += 1
 
-        if len(missing['missingFields']) > 0:
-            failMovies.append(missing)
+            if len(missing['missingFields']) > 0:
+                failMovies.append(missing)
 
-    return render_template('problem_movies.html', movieData = failMovies, neededFields = requiredFields, numProblemMovies = len(failMovies), numProblemFields = fieldCount)
+        return render_template('problem_movies.html', movieData = failMovies, neededFields = requiredFields, numProblemMovies = len(failMovies), numProblemFields = fieldCount)
+    else:
+        abort(404)
 
 @app.route('/Movie/<int:movieId>', methods = ['GET'])
 def show_movie(movieId):
@@ -269,7 +272,11 @@ def get_moviesData():
 
         if not os.path.isfile(xmlFilePath):
             log.info("Processing ZIP file")
-            process_zip(zipFilePath, outputDir)
+            try:
+                process_zip(zipFilePath, outputDir)
+            except IOError as e:
+                log.error("Unable to load movies: %s" % e)
+                sys.exit(2)
 
         log.info("Loading movies from XML")
         app.config['moviesList'] = process_xml(xmlFilePath)
