@@ -264,7 +264,6 @@ def search_imdb_name(token):
     except IMDbError, err:
         log.debug(err)
 
-
     return show_index()
 
 @app.route('/Admin/ReloadZIP')
@@ -274,6 +273,7 @@ def reload_zip():
     else:
         app.config['moviesList'] = False
         app.config['moviesStats'] = False
+        flash('Memory cleared')
         return redirect(url_for('admin'))
 
 def get_moviesData():
@@ -296,12 +296,14 @@ def get_moviesData():
         for movieData in app.config['moviesList']:
             movieData['MediaString'] = ', '.join(movieData['Medium'])
             movieData['index'] = app.config['moviesList'].index(movieData)
+        flash('Movies loaded from ZIP')
     return app.config['moviesList']
 
 def get_moviesStats():
     if not app.config['moviesStats']:
         log.info("Calculating statistics")
         app.config['moviesStats'] = calc_stats(get_moviesData())
+        flash('Movies stats calculated')
     return app.config['moviesStats']
 
 if __name__ == '__main__':

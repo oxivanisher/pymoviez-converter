@@ -21,7 +21,9 @@
 	<tbody>
 	{% for movie in movies %}
 		<tr>
-			<td><a href="{{ url_for('show_movie', movieId=movie.index) }}">{{movie.Title}}</a></td>
+			<td onmouseover="showPopup('{{ url_for('get_cover', movieId=movie.index) }}');" onmouseout="hidePopup();" onclick="document.location='{{ url_for('show_movie', movieId=movie.index) }}'">
+				<a href="{{ url_for('show_movie', movieId=movie.index) }}">{{movie.Title}}</a>
+			</td>
 			<td><a href="{{ url_for('show_search', field='Year', token=movie.Year) }}">{{movie.Year}}</a></td>
 			<td><a href="{{ url_for('show_search', field='Medium', token=movie.MediaString) }}">{{movie.MediaString}}</a></td>
 			<td><a href="{{ url_for('show_search', field='Loaned', token=movie.Loaned) }}">{{movie.Loaned}}</a></td>
