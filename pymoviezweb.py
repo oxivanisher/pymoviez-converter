@@ -19,6 +19,11 @@ import logging
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
 
 logging.basicConfig(filename='/tmp/pymoviezweb.log', format='%(asctime)s %(levelname)s:%(message)s', datefmt='%Y-%d-%m %H:%M:%S', level=logging.DEBUG)
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
 log = logging.getLogger(__name__)
 
 try:
@@ -31,10 +36,15 @@ from pymoviez import *
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-app.config.from_envvar('PYMOVIEZ_CFG', silent=False)
 app.config['scriptPath'] = os.path.dirname(os.path.realpath(__file__))
 app.config['moviesList'] = False
 app.config['moviesStats'] = False
+
+try:
+    app.config.from_envvar('PYMOVIEZ_CFG', silent=False)
+except RuntimeError as e:
+    log.error(e)
+    sys.exit(2)
 
 if not app.debug:
     from logging.handlers import SMTPHandler
