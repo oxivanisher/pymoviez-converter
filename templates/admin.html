@@ -3,9 +3,15 @@
 {% block content %}
 	<h3>Admin</h3>
 	<ul>
-		<li><a href="{{ url_for('reload_zip') }}">Reload movies from ZIP</a></li>
-		<li>Remove unused image files</li>
-		<li>Upload ZIP file</li>
-		<li>Download ZIP file</li>
+		<li><a href="{{ url_for('clear_dir') }}">Clear data Directory</a></li>
+		<li><a href="{{ url_for('reload_xml') }}">Reload movies</a></li>
+		<li><a href="{{ url_for('download_zip') }}">Download ZIP file</a></li>
 	</ul>
+	<form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+		<dl>
+			<dt>Upload ZIP File:
+			<dd><input type="file" name="file">
+			<dd><input type="Submit" value="Upload">
+		</dl>
+	</form>
 {% endblock %}

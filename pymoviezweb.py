@@ -17,6 +17,7 @@ import logging
 
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
+from werkzeug.utils import secure_filename
 
 logging.basicConfig(filename='/tmp/pymoviezweb.log', format='%(asctime)s %(levelname)s:%(message)s', datefmt='%Y-%d-%m %H:%M:%S', level=logging.DEBUG)
 console = logging.StreamHandler()
@@ -133,6 +134,10 @@ def calc_stats(moviesList):
 
     return (stats, actor, genre, director)
 
+# check for allowed file extensions
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1] in set(['zip'])
+
 # flask error handlers
 @app.errorhandler(404)
 def not_found(error):
@@ -143,9 +148,27 @@ def not_found(error):
 def show_index():
     moviesList = get_moviesData()
     if not moviesList:
-        return "Error loading movies!"
+        flash('Error loading movies!')
+    return render_template('index.html', movies = moviesList)
+
+@app.route('/Upload/', methods = ['POST'])
+def upload():
+    if 'logged_in' not in session:
+        log.info('Not logged in user tried to upload file')
     else:
-        return render_template('index.html', movies = moviesList)
+        if request.method == 'POST':
+            file = request.files['file']
+            log.info('Uploaded file: %s' % file.filename)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file.save(os.path.join(app.config['scriptPath'], 'movies.zip'))
+                flash('File uploaded')
+            else:
+                flash('Filename not allowed')
+        else:
+            flash('Wrong method')
+    return redirect(url_for('admin'))
 
 @app.route('/Search/<string:field>/<string:token>', methods = ['GET'])
 def show_search(field, token):
@@ -266,15 +289,33 @@ def search_imdb_name(token):
 
     return show_index()
 
-@app.route('/Admin/ReloadZIP')
-def reload_zip():
-    if 'logged_in' not in session:
-        return redirect(url_for('login'))
-    else:
+@app.route('/Admin/ReloadXML')
+def reload_xml():
+    if 'logged_in' in session:
         app.config['moviesList'] = False
         app.config['moviesStats'] = False
         flash('Memory cleared')
-        return redirect(url_for('admin'))
+    return redirect(url_for('admin'))
+
+@app.route('/Admin/ClearDir')
+def clear_dir():
+    if 'logged_in' in session:
+        outputDir = os.path.join(app.config['scriptPath'], app.config['OUTPUTDIR'])
+        for the_file in os.listdir(outputDir):
+            file_path = os.path.join(outputDir, the_file)
+            if the_file != '.keep':
+                try:
+                    if os.path.isfile(file_path):
+                        os.unlink(file_path)
+                except Exception, e:
+                    log.warning('File removal error: ' % e)
+        flash('Directory emptied')
+    return redirect(url_for('admin'))
+
+@app.route('/Admin/DownloadZip')
+def download_zip():
+    if 'logged_in' in session:
+        return send_from_directory(app.config['scriptPath'], 'movies.zip')
 
 def get_moviesData():
     if not app.config['moviesList']:
@@ -286,9 +327,10 @@ def get_moviesData():
             log.info("Processing ZIP file")
             try:
                 process_zip(zipFilePath, outputDir)
+                flash('Movies extracted from ZIP')
             except IOError as e:
-                log.error("Unable to load movies: %s" % e)
-                sys.exit(2)
+                log.warning("Unable to load movies: %s" % e)
+                return []
 
         log.info("Loading movies from XML")
         app.config['moviesList'] = process_xml(xmlFilePath)
@@ -296,7 +338,7 @@ def get_moviesData():
         for movieData in app.config['moviesList']:
             movieData['MediaString'] = ', '.join(movieData['Medium'])
             movieData['index'] = app.config['moviesList'].index(movieData)
-        flash('Movies loaded from ZIP')
+        flash('Movies loaded from XML')
     return app.config['moviesList']
 
 def get_moviesStats():
