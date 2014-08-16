@@ -6,6 +6,7 @@ output/*
 *.zip
 wsgilog.log*
 pymoviez.cfg
+pymoviezweb.db
 
 *.py[cod]
 

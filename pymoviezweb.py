@@ -18,6 +18,7 @@ import logging
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
 from werkzeug.utils import secure_filename
+from sqlite3 import dbapi2 as sqlite3
 
 logging.basicConfig(filename='/tmp/pymoviezweb.log', format='%(asctime)s %(levelname)s:%(message)s', datefmt='%Y-%d-%m %H:%M:%S', level=logging.DEBUG)
 console = logging.StreamHandler()
@@ -40,6 +41,7 @@ app.secret_key = os.urandom(24)
 app.config['scriptPath'] = os.path.dirname(os.path.realpath(__file__))
 app.config['moviesList'] = False
 app.config['moviesStats'] = False
+app.config['dbFile'] = "pymoviezweb.db"
 
 try:
     app.config.from_envvar('PYMOVIEZ_CFG', silent=False)
@@ -317,7 +319,42 @@ def download_zip():
     if 'logged_in' in session:
         return send_from_directory(app.config['scriptPath'], 'movies.zip')
 
+@app.teardown_appcontext
+def close_db(error):
+    """Closes the database again at the end of the request."""
+    if hasattr(g, 'sqlite_db'):
+        g.sqlite_db.close()
+
+def connect_db():
+    """Connects to the specific database."""
+    rv = sqlite3.connect(app.config['dbFile'])
+    rv.row_factory = sqlite3.Row
+    return rv
+
+def init_db():
+    """Initializes the database."""
+    db = get_db()
+    with app.open_resource('schema.sql', mode='r') as f:
+        db.cursor().executescript(f.read())
+    db.commit()
+
+def get_db():
+    """Opens a new database connection if there is none yet for the
+    current application context.
+    """
+    if not hasattr(g, 'sqlite_db'):
+        g.sqlite_db = connect_db()
+    return g.sqlite_db
+
 def get_moviesData():
+    db = get_db()
+    # cur = db.execute('select ts, anrede, vorname, name, firma, funktion, email, bemerkungen from entries order by id desc')
+    # entries = cur.fetchall()
+
+    # textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position']
+    # listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
+    # intAttributes  = ['Year']
+
     if not app.config['moviesList']:
         outputDir = os.path.join(app.config['scriptPath'], app.config['OUTPUTDIR'])
         xmlFilePath = os.path.join(outputDir, 'export.xml')
