@@ -3,6 +3,9 @@
 
 import logging
 import os
+import zipfile
+import hashlib
+import xml.etree.ElementTree as ET
 
 def getLogger(level=logging.INFO):
     logPath = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'log/pymoviezweb.log')
@@ -16,9 +19,36 @@ def getLogger(level=logging.INFO):
     logging.getLogger('').addHandler(console)
     return logging.getLogger(__name__)
 
-# check for allowed file extensions
+# some checks
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in set(['zip'])
+
+def get_needed_fields():
+        return ['Title', 'MovieID', 'Medium', 'Year', 'Genre', 'Director', 'Actor', 'Cover', 'Country', 'Length', 'MPAA', 'Plot', 'ReleaseDate']
+
+# hashfile
+def hashfile(filepath):
+    # helper function http://stackoverflow.com/questions/1869885/calculating-sha1-of-a-file
+    sha1 = hashlib.sha1()
+    f = open(filepath, 'rb')
+    try:
+        sha1.update(f.read())
+    finally:
+        f.close()
+    return sha1.hexdigest()
+
+def get_histfile():
+    return os.path.join(os.path.expanduser("~"), ".pymoviez-converter-lasthash")
+
+def load_old_hash():
+    old_hash = None
+    try:
+        file = open(get_histfile(), 'r')
+        old_hash = file.read()
+        file.close()
+        return old_hash
+    except IOError:
+        pass
 
 # pymoviez stats method
 def calc_stats(moviesList):
@@ -132,3 +162,131 @@ def process_xml(xml_data):
 
     logging.info("Parsed %s sets of movie data" % (len(movies)))
     return movies
+
+def process_zip(file_name, output_dir):
+    xml_file_name = "export.xml"
+    xml_file_path = None
+    try:
+        zfobj = zipfile.ZipFile(file_name)
+    except zipfile.BadZipfile:
+        logging.error("File is not a zip file")
+        return
+
+    if hashfile(file_name) == load_old_hash():
+        logging.info("Not running, same hashes that means no update")
+        return
+
+    if xml_file_name not in zfobj.namelist():
+        logging.error("No %s found in zipfile" % xml_file_name)
+        return
+    else:
+        cover_count = 0
+        for name in zfobj.namelist():
+            try:
+                uncompressed = zfobj.read(name)
+            except Exception as e:
+                logging.error("Error opening Zip File: %s" % e)
+                return
+
+            # save uncompressed data to disk
+            outputFilename = os.path.join(output_dir, name)
+            output = open(outputFilename,'wb')
+            output.write(uncompressed)
+            output.close()
+
+            if name == xml_file_name:
+                xml_file_path = outputFilename
+            else:
+                cover_count += 1
+
+        logging.info("Found %s covers and xml %s" % (cover_count, xml_file_path))
+        return xml_file_path
+
+def get_movie_attribs(movie):
+    scriptPath = os.path.dirname(os.path.realpath(__file__))
+    textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position', 'Location']
+    listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
+    intAttributes  = ['Year']
+    neededFields = get_needed_fields()
+    movieData = {}
+    unknownTags = []
+
+    for attrib in movie.iter("*"):
+        if attrib.tag in textAttributes:
+            if attrib.text:
+                movieData[attrib.tag] = attrib.text
+            else:
+                movieData[attrib.tag] = ""
+        elif attrib.tag in intAttributes:
+            if attrib.text:
+                movieData[attrib.tag] = int(attrib.text)
+            else:
+                movieData[attrib.tag] = 0
+        elif attrib.tag in listAttributes:
+            try:
+                movieData[attrib.tag]
+            except:
+                movieData[attrib.tag] = []
+
+            if attrib.tag == "Medium":
+                movieData[attrib.tag].append(attrib.text)
+            elif attrib.tag == "Genre":
+                if attrib.text:
+                    if "&" in attrib.text:
+                        for value in attrib.text.split('&'):
+                            movieData[attrib.tag].append(value.strip())
+                    else:
+                        movieData[attrib.tag].append(attrib.text)
+            elif attrib.tag == "Director":
+                if attrib.text:
+                    if "," in attrib.text:
+                        for value in attrib.text.split(','):
+                            movieData[attrib.tag].append(value.strip())
+                    else:
+                        movieData[attrib.tag].append(attrib.text)
+            elif attrib.tag == "Actor":
+                if attrib.text:
+                    if attrib.text.count(',') > 1:
+                        for value in attrib.text.split(','):
+                            movieData[attrib.tag].append(value.strip())
+                    else:
+                        movieData[attrib.tag].append(attrib.text)
+        else:
+            if attrib.text:
+                if len(attrib.text.strip()) > 0:
+                    unknownTags.append(attrib.tag)
+
+    for field in neededFields:
+        if field not in movieData:
+            tmpTitle = os.urandom(16).encode('hex')
+            if 'Title' in movieData:
+                tmpTitle = movieData['Title']
+            # movieData[field] = tmpTitle
+
+    for field in textAttributes:
+        if field not in movieData.keys():
+            movieData[field] = ""
+    for field in listAttributes:
+        if field not in movieData.keys():
+            movieData[field] = []
+    for field in intAttributes:
+        if field not in movieData.keys():
+            movieData[field] = 0
+
+    if len(unknownTags) > 0:
+        logging.info("Unknown or empty tags for movie: %s (%s)" % (movieData['Title'], ', '.join(unknownTags)))
+
+    if movieData['Cover']:
+        if not os.path.isfile(os.path.join(scriptPath, "output/", movieData['Cover'])):
+            logging.info("Missing Cover for movie: %s" % movieData['Title'])
+
+    if 'Year' in movieData.keys() < 10:
+        movieData['Year'] = 0
+        logging.info("Missing movie Year for: %s" % movieData['Title'])
+
+    if 'Length' not in movieData.keys():
+        movieData['Length'] = 0
+    elif "min" in movieData['Length']:
+        movieData['Length'] = movieData['Length'].replace('min', '').strip()
+
+    return movieData
