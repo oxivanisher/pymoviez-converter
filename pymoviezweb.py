@@ -146,9 +146,19 @@ def not_found(error):
     return render_template('error.html'), 404
 
 # flask urls / paths
+@app.before_first_request
+def before_first_request():
+    log.info("Before first request called:")
+    log.info("dbFile:     %s" % app.config['dbFile'])
+    log.info("scriptPath: %s" % app.config['scriptPath'])
+
 @app.route('/')
 def show_index():
     moviesList = get_moviesData()
+    if not os.path.isfile(app.config['dbFile']):
+        init_db()
+        flash('Database initialized.')
+        log.info('Database initialized.')
     if not moviesList:
         flash('Error loading movies!')
     return render_template('index.html', movies = moviesList)
