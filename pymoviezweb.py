@@ -14,19 +14,13 @@ import os
 import sys
 import signal
 import logging
-
+from helper import *
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
 from werkzeug.utils import secure_filename
 from sqlite3 import dbapi2 as sqlite3
 
-logging.basicConfig(filename='/tmp/pymoviezweb.log', format='%(asctime)s %(levelname)s:%(message)s', datefmt='%Y-%d-%m %H:%M:%S', level=logging.DEBUG)
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
-console.setFormatter(formatter)
-logging.getLogger('').addHandler(console)
-log = logging.getLogger(__name__)
+log = getLogger(level=logging.INFO)
 
 try:
     from imdb import IMDb, IMDbError
