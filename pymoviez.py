@@ -18,7 +18,7 @@ def get_needed_fields():
 
 def get_movie_attribs(movie):
     scriptPath = os.path.dirname(os.path.realpath(__file__))
-    textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position']
+    textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position', 'Location']
     listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
     intAttributes  = ['Year']
     neededFields = get_needed_fields()

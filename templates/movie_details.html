@@ -125,13 +125,21 @@
 			</tr>
 			{% endif %}
 
+			{% if movie.Location != "" %}
+			<tr>
+				<td>Location</td>
+				<td>{{ movie.Location }}</td>
+			</tr>
+			{% endif %}
+
+<!--
 			{% if movie.Position != "" %}
 			<tr>
 				<td>Position</td>
 				<td>{{ movie.Position }}</td>
 			</tr>
 			{% endif %}
-
+-->
 		</tbody>
 	</table>
 	<br />

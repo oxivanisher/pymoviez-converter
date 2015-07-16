@@ -5,7 +5,6 @@
 
 # http://webpy.org/  http://webpy.org/docs/0.3/tutorial
 # https://github.com/defunkt/pystache 
-#!/usr/bin/env python
 # http://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
 
 # sudo apt-get install python-sqlobject python-imdbpy
