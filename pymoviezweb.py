@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
+# http://blogging.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
 
 # http://webpy.org/  http://webpy.org/docs/0.3/tutorial
 # https://github.com/defunkt/pystache 
-# http://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
+# http://blogging.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
 
 # sudo apt-get install python-sqlobject python-imdbpy
 
@@ -19,15 +19,15 @@ from flask import Flask, request, session, g, redirect, url_for, abort, render_t
 from werkzeug.utils import secure_filename
 from sqlite3 import dbapi2 as sqlite3
 
-log = getLogger(level=logging.INFO)
+getLogger(level=logging.INFO)
 
 try:
     from imdb import IMDb, IMDbError
 except ImportError:
-    log.error("Please install the IMDB lib: apt-get install python-imdbpy")
+    logging.error("Please install the IMDB lib: apt-get install python-imdbpy")
     sys.exit(2)
 
-from pymoviez import *
+# from pymoviez import *
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -39,7 +39,7 @@ app.config['dbFile'] = os.path.join(app.config['scriptPath'], 'pymoviezweb.db')
 try:
     app.config.from_envvar('PYMOVIEZ_CFG', silent=False)
 except RuntimeError as e:
-    log.error(e)
+    logging.error(e)
     sys.exit(2)
 
 if not app.debug:
@@ -47,91 +47,6 @@ if not app.debug:
     mail_handler = SMTPHandler(app.config['EMAILSERVER'], app.config['EMAILFROM'], ADMINS, current_app.name + ' failed!')
     mail_handler.setLevel(logging.ERROR)
     app.logger.addHandler(mail_handler)
-
-def calc_stats(moviesList):
-    moviesList = get_moviesData()
-    stats = {}
-    countries = {}
-    stats['movieCount'] = len(moviesList)
-
-    media = []
-    allMedia = []
-
-    actor = []
-    allActor = []
-    genre = []
-    allGenre = []
-    director = []
-    allDirector = []
-
-    actorToMovie = {}
-    genereToMovie = {}
-    directorToMovie = {}
-
-    for movie in moviesList:
-        # calculate media stats
-        for medium in movie['Medium']:
-            allMedia.append(medium)
-        media = sorted(list(set(allMedia)))
-
-        # calculate actor stats
-        for actor in movie['Actor']:
-            allActor.append(actor)
-            if actor in actorToMovie.keys():
-                actorToMovie[actor].append(movie['Title'])
-            else:
-                actorToMovie[actor] = [movie['Title']]
-        actor = sorted(list(set(allActor)))
-
-        # calculate genere stats
-        for genre in movie['Genre']:
-            allGenre.append(genre)
-            if genre in genereToMovie.keys():
-                genereToMovie[genre].append(movie['Title'])
-            else:
-                genereToMovie[genre] = [movie['Title']]
-        genre = sorted(list(set(allGenre)))
-
-        # calculate director stats
-        for director in movie['Director']:
-            allDirector.append(director)
-            if director in directorToMovie.keys():
-                directorToMovie[director].append(movie['Title'])
-            else:
-                directorToMovie[director] = [movie['Title']]
-        director = sorted(list(set(allDirector)))
-
-        # calculate country
-        if not movie['Country']:
-            movie['Country'] = "Unknown"
-        try:
-            countries[movie['Country']] += 1
-        except:
-            countries[movie['Country']] = 1
-
-    for i in xrange(len(media)):
-        media[i] = (media[i], allMedia.count(media[i]))
-    for i in xrange(len(actor)):
-        actor[i] = (actor[i], allActor.count(actor[i]), ', '.join(actorToMovie[actor[i]]))
-    for i in xrange(len(genre)):
-        genre[i] = (genre[i], allGenre.count(genre[i]), ', '.join(genereToMovie[genre[i]]))
-    for i in xrange(len(director)):
-        director[i] = (director[i], allDirector.count(director[i]), ', '.join(directorToMovie[director[i]]))
-
-    stats['media'] = media
-    stats['numMedium'] = len(media)
-    stats['numActor'] = len(actor)
-    stats['numGenere'] = len(genre)
-    stats['numDirector'] = len(director)
-    stats['allCountry'] = []
-    for key in sorted(countries.keys()):
-        stats['allCountry'].append({ 'name': key, 'count': countries[key] })
-
-    return (stats, actor, genre, director)
-
-# check for allowed file extensions
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in set(['zip'])
 
 # flask error handlers
 @app.errorhandler(404)
@@ -141,9 +56,9 @@ def not_found(error):
 # flask urls / paths
 @app.before_first_request
 def before_first_request():
-    log.info("Before first request called:")
-    log.info("dbFile:     %s" % app.config['dbFile'])
-    log.info("scriptPath: %s" % app.config['scriptPath'])
+    logging.info("Before first request called:")
+    logging.info("dbFile:     %s" % app.config['dbFile'])
+    logging.info("scriptPath: %s" % app.config['scriptPath'])
 
 @app.route('/')
 def show_index():
@@ -151,7 +66,7 @@ def show_index():
     if not os.path.isfile(app.config['dbFile']):
         init_db()
         flash('Database initialized.')
-        log.info('Database initialized.')
+        logging.info('Database initialized.')
     if not moviesList:
         flash('Error loading movies!')
     return render_template('index.html', movies = moviesList)
@@ -159,11 +74,11 @@ def show_index():
 @app.route('/Upload/', methods = ['POST'])
 def upload():
     if 'logged_in' not in session:
-        log.info('Not logged in user tried to upload file')
+        logging.info('Not logged in user tried to upload file')
     else:
         if request.method == 'POST':
             file = request.files['file']
-            log.info('Uploaded file: %s' % file.filename)
+            logging.info('Uploaded file: %s' % file.filename)
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -229,13 +144,13 @@ def get_cover(movieId):
 def login():
     if request.method == 'POST':
         if request.form['username'] != app.config['USERNAME']:
-            log.info("Invalid username for %s" % request.form['username'])
+            logging.info("Invalid username for %s" % request.form['username'])
             flash('Invalid login')
         elif request.form['password'] != app.config['PASSWORD']:
-            log.info("Invalid password for %s" % request.form['username'])
+            logging.info("Invalid password for %s" % request.form['username'])
             flash('Invalid login')
         else:
-            log.info("%s Logged in" % request.form['username'])
+            logging.info("%s Logged in" % request.form['username'])
             session['logged_in'] = True
             flash('Logged in')
             return redirect(url_for('admin'))
@@ -283,14 +198,14 @@ def show_problems():
 def search_imdb_name(token):
     ia = IMDb()
     # s_result = ia.search_movie(token)
-    log.debug("Querying IMDB for movie name: %s" % token)
+    logging.debug("Querying IMDB for movie name: %s" % token)
     try:
         s_result = ia.search_movie(token)
-        log.debug(s_result)
+        logging.debug(s_result)
         for item in s_result:
-            log.debug(item['long imdb canonical title'], item.movieID)
+            logging.debug(item['long imdb canonical title'], item.movieID)
     except IMDbError, err:
-        log.debug(err)
+        logging.debug(err)
 
     return show_index()
 
@@ -313,7 +228,7 @@ def clear_dir():
                     if os.path.isfile(file_path):
                         os.unlink(file_path)
                 except Exception, e:
-                    log.warning('File removal error: ' % e)
+                    logging.warning('File removal error: ' % e)
         flash('Directory emptied')
     return redirect(url_for('admin'))
 
@@ -364,15 +279,15 @@ def get_moviesData():
         zipFilePath = os.path.join(app.config['scriptPath'], 'movies.zip')
 
         if not os.path.isfile(xmlFilePath):
-            log.info("Processing ZIP file")
+            logging.info("Processing ZIP file")
             try:
                 process_zip(zipFilePath, outputDir)
                 flash('Movies extracted from ZIP')
             except IOError as e:
-                log.warning("Unable to load movies: %s" % e)
+                logging.warning("Unable to load movies: %s" % e)
                 return []
 
-        log.info("Loading movies from XML")
+        logging.info("Loading movies from XML")
         app.config['moviesList'] = process_xml(xmlFilePath)
 
         for movieData in app.config['moviesList']:
@@ -383,7 +298,7 @@ def get_moviesData():
 
 def get_moviesStats():
     if not app.config['moviesStats']:
-        log.info("Calculating statistics")
+        logging.info("Calculating statistics")
         app.config['moviesStats'] = calc_stats(get_moviesData())
         flash('Movies stats calculated')
     return app.config['moviesStats']

@@ -9,8 +9,9 @@ import os.path
 import xml.etree.ElementTree as ET
 import logging
 
-logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', datefmt='%Y-%d-%m %H:%M:%S', level=logging.DEBUG)
-log = logging.getLogger(__name__)
+from helper import *
+
+logging.getLogger(__name__)
 
 # http://stackoverflow.com/questions/7806563/how-to-unzip-a-zip-file-with-python-2-4
 def get_needed_fields():
@@ -88,15 +89,15 @@ def get_movie_attribs(movie):
             movieData[field] = 0
 
     if len(unknownTags) > 0:
-        log.info("Unknown or empty tags for movie: %s (%s)" % (movieData['Title'], ', '.join(unknownTags)))
+        logging.info("Unknown or empty tags for movie: %s (%s)" % (movieData['Title'], ', '.join(unknownTags)))
 
     if movieData['Cover']:
         if not os.path.isfile(os.path.join(scriptPath, "output/", movieData['Cover'])):
-            log.info("Missing Cover for movie: %s" % movieData['Title'])
+            logging.info("Missing Cover for movie: %s" % movieData['Title'])
 
     if 'Year' in movieData.keys() < 10:
         movieData['Year'] = 0
-        log.info("Missing movie Year for: %s" % movieData['Title'])
+        logging.info("Missing movie Year for: %s" % movieData['Title'])
 
     if 'Length' not in movieData.keys():
         movieData['Length'] = 0
@@ -104,36 +105,6 @@ def get_movie_attribs(movie):
         movieData['Length'] = movieData['Length'].replace('min', '').strip()
 
     return movieData
-
-def process_xml(xml_data):
-    if not xml_data:
-        return
-        
-    movies = []
-    movie_ids = []
-    
-    try:
-        tree = ET.parse(xml_data)
-    except Exception as e:
-        log.error("unable to load xml data: %s" % e)
-
-    try:
-        root = tree.getroot()
-    except Exception as e:
-        log.error("unable to load xml data: %s" % e)
-        return
-
-    for movie in root.iter("Movie"):
-        movieData = get_movie_attribs(movie)
-        movies.append(movieData)
-
-        if movieData['MovieID'] in movie_ids:
-            log.warning("Duplicated MovieID found! Please fix: %s" % movieData['Title'])
-        else:
-            movie_ids.append(movieData['MovieID'])
-
-    log.info("Parsed %s sets of movie data" % (len(movies)))
-    return movies
 
 def create_html(movies):
     html_data  = "<html><head><title>Movie List</title></head><body>\n"
@@ -175,7 +146,7 @@ def create_html(movies):
                                                                                 medium)
     html_data += "</table></body></html>\n"
 
-    log.info("created html table with %s entries" % len(movies))
+    logging.info("created html table with %s entries" % len(movies))
     return html_data
 
 def create_csv(movies):
@@ -191,7 +162,7 @@ def create_csv(movies):
                                                 movie['LoanDate'],
                                                 movie['Cover'])
 
-    log.info("created csv data with %s entries" % len(movies))
+    logging.info("created csv data with %s entries" % len(movies))
     return csv_data
 
 def hashfile(filepath):
@@ -223,15 +194,15 @@ def process_zip(file_name, output_dir):
     try:
         zfobj = zipfile.ZipFile(file_name)
     except zipfile.BadZipfile:
-        log.error("File is not a zip file")
+        logging.error("File is not a zip file")
         return
 
     if hashfile(file_name) == load_old_hash():
-        log.info("Not running, same hashes that means no update")
+        logging.info("Not running, same hashes that means no update")
         return
 
     if xml_file_name not in zfobj.namelist():
-        log.error("No %s found in zipfile" % xml_file_name)
+        logging.error("No %s found in zipfile" % xml_file_name)
         return
     else:
         cover_count = 0
@@ -239,7 +210,7 @@ def process_zip(file_name, output_dir):
             try:
                 uncompressed = zfobj.read(name)
             except Exception as e:
-                log.error("Error opening Zip File: %s" % e)
+                logging.error("Error opening Zip File: %s" % e)
                 return
 
             # save uncompressed data to disk
@@ -253,7 +224,7 @@ def process_zip(file_name, output_dir):
             else:
                 cover_count += 1
 
-        log.info("Found %s covers and xml %s" % (cover_count, xml_file_path))
+        logging.info("Found %s covers and xml %s" % (cover_count, xml_file_path))
         return xml_file_path
 
 # main
@@ -287,7 +258,7 @@ if __name__ == '__main__':
                 file.write(hashfile(sys.argv[1]))
                 file.close()
             except IOError:
-                log.error("unable to save last hash to %s" % get_histfile())
+                logging.error("unable to save last hash to %s" % get_histfile())
 
     else:
-        log.error("please add a filepath/name to movies.zip export file")
+        logging.error("please add a filepath/name to movies.zip export file")
