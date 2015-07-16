@@ -41,7 +41,7 @@ app.secret_key = os.urandom(24)
 app.config['scriptPath'] = os.path.dirname(os.path.realpath(__file__))
 app.config['moviesList'] = False
 app.config['moviesStats'] = False
-app.config['dbFile'] = "pymoviezweb.db"
+app.config['dbFile'] = os.path.join(app.config['scriptPath'], 'pymoviezweb.db')
 
 try:
     app.config.from_envvar('PYMOVIEZ_CFG', silent=False)
