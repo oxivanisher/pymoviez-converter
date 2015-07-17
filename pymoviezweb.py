@@ -28,8 +28,6 @@ except ImportError:
     logging.error("Please install the IMDB lib: apt-get install python-imdbpy")
     sys.exit(2)
 
-# from pymoviez import *
-
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 app.config['scriptPath'] = os.path.dirname(os.path.realpath(__file__))
