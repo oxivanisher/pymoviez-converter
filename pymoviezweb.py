@@ -16,17 +16,30 @@ import logging
 
 from helper import *
 
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app
 from werkzeug.utils import secure_filename
 from sqlite3 import dbapi2 as sqlite3
 
-getLogger(level=logging.INFO)
+# flask imports
+try:
+    from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app, jsonify, Markup
+except ImportError:
+    log.error("[System] Please install flask")
+    sys.exit(2)
+
+try:
+    from flask.ext.sqlalchemy import SQLAlchemy
+    from sqlalchemy.exc import IntegrityError, InterfaceError, InvalidRequestError, OperationalError
+except ImportError:
+    log.error("[System] Please install the sqlalchemy extension for flask")
+    sys.exit(2)
 
 try:
     from imdb import IMDb, IMDbError
 except ImportError:
     logging.error("Please install the IMDB lib: apt-get install python-imdbpy")
     sys.exit(2)
+
+getLogger(level=logging.INFO)
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -46,6 +59,43 @@ if not app.debug:
     mail_handler = SMTPHandler(app.config['EMAILSERVER'], app.config['EMAILFROM'], ADMINS, current_app.name + ' failed!')
     mail_handler.setLevel(logging.ERROR)
     app.logger.addHandler(mail_handler)
+
+db = SQLAlchemy(app)
+with app.test_request_context():
+    try:
+        db.create_all()
+    except OperationalError as e:
+        log.warning("System] Unable to create or check database tables! DB Server is probably not available...")
+
+# movie class
+class Movie(db.Model):
+    __tablename__ = 'movies'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    network_handle = db.Column(db.String(20))
+    entry_name = db.Column(db.String(20))
+    last_update = db.Column(db.Integer)
+    cache_data = db.Column(db.UnicodeText) #MEDIUMTEXT
+    
+    __table_args__ = (db.UniqueConstraint(network_handle, entry_name, name="handle_name_uc"), )
+
+    def __init__(self, network_handle, entry_name, cache_data = ""):
+        self.network_handle = network_handle
+        self.entry_name = entry_name
+        self.last_update = 0
+        self.cache_data = cache_data
+
+    def __repr__(self):
+        return '<MMONetworkCache %r>' % self.id
+
+    def get(self):
+        return json.loads(self.cache_data)
+
+    def set(self, cache_data):
+        self.cache_data = json.dumps(cache_data)
+
+    def age(self):
+        return int(time.time()) - self.last_update
 
 # flask error handlers
 @app.errorhandler(404)
@@ -268,7 +318,7 @@ def get_moviesData():
     # cur = db.execute('select ts, anrede, vorname, name, firma, funktion, email, bemerkungen from entries order by id desc')
     # entries = cur.fetchall()
 
-    # textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position']
+    # textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position', 'Location']
     # listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
     # intAttributes  = ['Year']
 
