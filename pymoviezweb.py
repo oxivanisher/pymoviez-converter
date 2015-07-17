@@ -23,14 +23,14 @@ from sqlite3 import dbapi2 as sqlite3
 try:
     from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, make_response, send_from_directory, current_app, jsonify, Markup
 except ImportError:
-    log.error("[System] Please install flask")
+    log.error("Please install flask")
     sys.exit(2)
 
 try:
     from flask.ext.sqlalchemy import SQLAlchemy
     from sqlalchemy.exc import IntegrityError, InterfaceError, InvalidRequestError, OperationalError
 except ImportError:
-    log.error("[System] Please install the sqlalchemy extension for flask")
+    log.error("Please install the sqlalchemy extension for flask")
     sys.exit(2)
 
 try:
@@ -70,32 +70,50 @@ with app.test_request_context():
 # movie class
 class Movie(db.Model):
     __tablename__ = 'movies'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    network_handle = db.Column(db.String(20))
-    entry_name = db.Column(db.String(20))
-    last_update = db.Column(db.Integer)
-    cache_data = db.Column(db.UnicodeText) #MEDIUMTEXT
-    
-    __table_args__ = (db.UniqueConstraint(network_handle, entry_name, name="handle_name_uc"), )
 
-    def __init__(self, network_handle, entry_name, cache_data = ""):
-        self.network_handle = network_handle
-        self.entry_name = entry_name
-        self.last_update = 0
-        self.cache_data = cache_data
+    # listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    Title = db.Column(db.String(255))
+    Cover = db.Column(db.String(255))
+    Country = db.Column(db.String(255))
+    Loaned = db.Column(db.String(255))
+    LoanDate = db.Column(db.String(255))
+    Length = db.Column(db.String(255))
+    URL = db.Column(db.String(255))
+    MovieID = db.Column(db.String(255))
+    MPAA = db.Column(db.String(255))
+    PersonalRating = db.Column(db.String(255))
+    PurchaseDate = db.Column(db.String(255))
+    Seen = db.Column(db.String(255))
+    Rating = db.Column(db.String(255))
+    Status = db.Column(db.String(255))
+    ReleaseDate = db.Column(db.String(255))
+    Notes = db.Column(db.String(255))
+    Position = db.Column(db.String(255))
+    Location = db.Column(db.String(255))
+
+    Year = db.Column(db.Integer)
+
+    Plot = db.Column(db.UnicodeText) #MEDIUMTEXT
+    
+    # __table_args__ = (db.UniqueConstraint(network_handle, entry_name, name="handle_name_uc"), )
+
+    def __init__(self, Title):
+        self.Title = Title
 
     def __repr__(self):
-        return '<MMONetworkCache %r>' % self.id
+        return '<Movie %r>' % self.id
 
-    def get(self):
-        return json.loads(self.cache_data)
+    # def get(self):
+    #     return json.loads(self.cache_data)
 
-    def set(self, cache_data):
-        self.cache_data = json.dumps(cache_data)
+    # def set(self, cache_data):
+    #     self.cache_data = json.dumps(cache_data)
 
-    def age(self):
-        return int(time.time()) - self.last_update
+    # def age(self):
+    #     return int(time.time()) - self.last_update
 
 # flask error handlers
 @app.errorhandler(404)
@@ -315,8 +333,6 @@ def get_db():
 
 def get_moviesData():
     db = get_db()
-    # cur = db.execute('select ts, anrede, vorname, name, firma, funktion, email, bemerkungen from entries order by id desc')
-    # entries = cur.fetchall()
 
     # textAttributes = ['Title', 'Cover', 'Country', 'Loaned', 'LoanDate', 'Length', 'URL', 'MovieID', 'MPAA', 'PersonalRating', 'PurchaseDate', 'Seen', 'Rating', 'Status', 'Plot', 'ReleaseDate', 'Notes', 'Position', 'Location']
     # listAttributes = ['Medium', 'Genre', 'Director', 'Actor' ]
